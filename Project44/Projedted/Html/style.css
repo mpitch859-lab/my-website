@@ -1,0 +1,41 @@
+/* UI Modern white-blue theme */
+:root{
+--bg:#9bcaee;
+--card:#ffffff;
+--accent:#0b84ff;
+--muted:#6b7280;
+--shadow: 0 8px 20px rgba(11,132,255,0.08);
+--radius:12px;
+}
+*{box-sizing:border-box}
+body.bg{background:var(--bg);font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial}
+body.bg1{background:var(--bg);font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;padding:0;}
+.container{max-width:1000px;margin:28px auto;padding:0 16px}
+.card{background:var(--card);padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px}
+.topbar{background:transparent;padding:12px 0}
+.topbar-inner{display:flex;justify-content:space-between;align-items:center}
+.brand h2{margin:0;font-weight:700}
+.brand .accent{color:var(--accent)}
+nav a{margin-right:14px;color:#0f1724;text-decoration:none}
+.btn{background:transparent;border:1px solid #e6eefb;padding:10px 14px;border-radius:10px;cursor:pointer}
+.btn-primary{background:var(--accent);color:white;border:none}
+.btn-outline{background:transparent;border:1px solid var(--accent);color:var(--accent)}
+.btn-link{background:var(--accent);color:white;border:none}
+.auth-card{max-width:900px;margin:40px auto;padding:28px}
+.cols{display:flex;gap:18px}
+.col{flex:1}
+input, select{width:100%;padding:10px;border:1px solid #e6eefb;border-radius:10px;margin:8px 0}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.row{display:flex;gap:12px;margin-top:12px}
+.list .txn{display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #f0f4f8}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.chart-wrap{max-width:700px;margin-top:16px}
+.card1{background:var(--card);padding:40px 32px;border-radius:var(--radius);box-shadow:var(--shadow);width:350px;text-align:center;}
+.h1{margin:0 0 10px 0}
+.p{color:var(--muted);margin:0 0 25px 0}
+.btn1{width:100%;padding:12px 16px;border-radius:10px;cursor:pointer;font-size:16px;margin-top:12px;}
+.btn-primary1{background:var(--accent);color:white;border:none;font-weight:500;}
+.btn-outline1{background:transparent;border:2px solid var(--accent);color:var(--accent);font-weight:500;}
+#calendar{max-width:900px}
+@media(max-width:800px){.cols{flex-direction:column}.form-grid{grid-template-columns:1fr}}
