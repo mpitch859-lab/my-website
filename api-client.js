@@ -1,5 +1,5 @@
 // js/api-client.js
-import { WEB_APP_URL } from "config.js";
+import { WEB_APP_URL } from "./config.js";
 async function callApi(action, payload = {}) {
 const token = sessionStorage.getItem("session_token");
 const body = { action, payload };

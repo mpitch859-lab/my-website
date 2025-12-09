@@ -1,5 +1,5 @@
 // js/calendar.js
-import { callApi } from "api-client.js";
+import { callApi } from "./api-client.js";
 async function initCalendar() {
 try {
     const res = await callApi("list", {});

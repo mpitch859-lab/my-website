@@ -1,5 +1,5 @@
 // js/transactions.js
-import { callApi } from "api-client.js";
+import { callApi } from "./api-client.js";
 
 const btnSave = document.getElementById("btnSave");
 const listDiv = document.getElementById("list");

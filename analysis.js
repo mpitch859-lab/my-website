@@ -1,5 +1,5 @@
 // js/analysis.js
-import { callApi } from "api-client.js";
+import { callApi } from "./api-client.js";
 const btnAnalyze = document.getElementById("btnAnalyze");
 const btnAnalyzeWeek = document.getElementById("btnAnalyzeWeek");
 const monthInput = document.getElementById("monthSelect");
