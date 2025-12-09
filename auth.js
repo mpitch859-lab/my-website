@@ -1,5 +1,5 @@
 // js/auth.js
-import { WEB_APP_URL } from "./config.js";
+import { WEB_APP_URL } from "config.js";
 
 async function call(action, payload = {}, token = null) {
   const body = { action, payload };
