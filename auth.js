@@ -1,19 +1,15 @@
 // js/auth.js
 import { WEB_APP_URL } from "config.js";
-
 async function call(action, payload = {}, token = null) {
   const body = { action, payload };
   if (token) body.token = token;
-
   const res = await fetch(WEB_APP_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-
   return await res.json();
 }
-
 /* ---------- REGISTER (on register.html) ---------- */
 const btnRegister = document.getElementById("btnRegister");
 if (btnRegister) {
@@ -79,7 +75,6 @@ if (protectedPages.includes(path)) {
     if (nameEl) nameEl.textContent = sessionStorage.getItem("userName") || "";
   }
 }
-
 /* ---------- FORGOT PASSWORD (forgot.html) ---------- */
 const btnForgot = document.getElementById("btnForgot");
 if (btnForgot) {
@@ -94,7 +89,6 @@ if (btnForgot) {
     } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
   });
 }
-
 /* ---------- RESET PASSWORD (reset.html) ---------- */
 const btnReset = document.getElementById("btnReset");
 if (btnReset) {
