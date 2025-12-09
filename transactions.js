@@ -1,9 +1,8 @@
 // js/transactions.js
-import { callApi } from "./api-client.js";
+import { callApi } from "api-client.js";
 
 const btnSave = document.getElementById("btnSave");
 const listDiv = document.getElementById("list");
-
 if (btnSave) {
 btnSave.addEventListener("click", async () => {
     try {
@@ -13,14 +12,12 @@ btnSave.addEventListener("click", async () => {
     const date = document.getElementById("date").value;
     const note = document.getElementById("note").value || "";
     if (!amount || !date) return alert("กรุณากรอกจำนวนเงินและวันที่");
-
     const resp = await callApi("add", { type, category, amount, date, note });
     alert("บันทึกเรียบร้อย");
     loadTransactions();
     } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
 });
 }
-
 export async function loadTransactions() {
 try {
     const resp = await callApi("list", {});
@@ -41,7 +38,6 @@ try {
     `;
     listDiv.appendChild(el);
     });
-
     document.querySelectorAll(".edit").forEach(btn => {
     btn.addEventListener("click", async (e) => {
         const id = e.target.dataset.id;
@@ -53,7 +49,6 @@ try {
         loadTransactions();
     });
     });
-
     document.querySelectorAll(".del").forEach(btn => {
     btn.addEventListener("click", async (e) => {
         const id = e.target.dataset.id;
@@ -63,10 +58,8 @@ try {
         loadTransactions();
     });
     });
-
 } catch (e) { console.error(e); if (e.message) alert(e.message); }
 }
-
 // load on page ready
 if (window.location.pathname.split("/").pop() === "record.html") {
 window.addEventListener("DOMContentLoaded", loadTransactions);

@@ -1,6 +1,5 @@
 // js/analysis.js
-import { callApi } from "./api-client.js";
-
+import { callApi } from "api-client.js";
 const btnAnalyze = document.getElementById("btnAnalyze");
 const btnAnalyzeWeek = document.getElementById("btnAnalyzeWeek");
 const monthInput = document.getElementById("monthSelect");
@@ -8,10 +7,8 @@ const analysisText = document.getElementById("analysisText");
 const analysisTable = document.getElementById("analysisTable");
 const chartEl = document.getElementById("chart");
 let chartInstance = null;
-
 const now = new Date();
 if (monthInput) monthInput.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-
 if (btnAnalyze) {
 btnAnalyze.addEventListener("click", async () => {
     const m = monthInput.value;
@@ -30,7 +27,6 @@ btnAnalyze.addEventListener("click", async () => {
     } catch (e) { alert(e.message); }
 });
 }
-
 if (btnAnalyzeWeek) {
 btnAnalyzeWeek.addEventListener("click", async () => {
     const m = monthInput.value;

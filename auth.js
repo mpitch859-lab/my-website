@@ -27,7 +27,6 @@ if (btnRegister) {
     } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
   });
 }
-
 /* ---------- LOGIN (on login.html) ---------- */
 const btnLogin = document.getElementById("btnLogin");
 if (btnLogin) {
@@ -46,7 +45,6 @@ if (btnLogin) {
     } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
   });
 }
-
 /* ---------- LOGOUT (same page protected) ---------- */
 const btnLogout = document.getElementById("btnLogout");
 if (btnLogout) {
@@ -61,7 +59,6 @@ if (btnLogout) {
     window.location = "login.html";
   });
 }
-
 /* ---------- PROTECT PAGES (client-side) ---------- */
 const protectedPages = ["record.html", "analysis.html", "calendar.html"];
 const path = window.location.pathname.split("/").pop();

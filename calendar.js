@@ -1,6 +1,5 @@
 // js/calendar.js
-import { callApi } from "./api-client.js";
-
+import { callApi } from "api-client.js";
 async function initCalendar() {
 try {
     const res = await callApi("list", {});
@@ -11,7 +10,6 @@ try {
     start: item.date,
     color: item.type === 'income' ? 'green' : 'red'
     }));
-
     const calendarEl = document.getElementById('calendar');
     const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
@@ -23,7 +21,6 @@ try {
     calendar.render();
 } catch (e) { console.error(e); alert(e.message); }
 }
-
 if (window.location.pathname.split("/").pop() === "calendar.html") {
 window.addEventListener("DOMContentLoaded", initCalendar);
 }
