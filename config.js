@@ -1,2 +1,2 @@
     // js/config.js
-    export const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx_5IjcH8-2HWkZYqG6v1QG34uP1B9mJ-BMPi5LSLKZpjUDnOxrFmgMl3YIv68NL5VS/exec";
+    export const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxxbklaMWlKNy33zi0GgVlK1ji-dhsWUIvkcpcC9jTMiQABJJZaaUX7TP26Hp00IEh-/exec";

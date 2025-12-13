@@ -1,15 +1,17 @@
 // js/auth.js
 import { WEB_APP_URL } from "./config.js";
-console.log("auth.js loaded");
 async function call(action, payload = {}, token = null) {
   const body = { action, payload };
   if (token) body.token = token;
-  const res = await fetch(WEB_APP_URL, {
+  await fetch(WEB_APP_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify(body),
   });
-  return await res.json();
+  return { ok: true };
 }
 /* ---------- REGISTER (on register.html) ---------- */
 const btnRegister = document.getElementById("btnRegister");
@@ -104,4 +106,3 @@ if (btnReset) {
     } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
   });
 }
-
