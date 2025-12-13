@@ -62,7 +62,7 @@ if (btnLogout) {
   btnLogout.addEventListener("click", async () => {
     const token = sessionStorage.getItem("session_token");
     if (token) {
-      await call("logout", {}, token);
+      await call("logout", {});
     }
     sessionStorage.removeItem("session_token");
     sessionStorage.removeItem("userId");

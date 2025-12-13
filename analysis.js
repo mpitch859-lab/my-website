@@ -32,7 +32,6 @@ btnAnalyzeWeek.addEventListener("click", async () => {
     const m = monthInput.value;
     if (!m) return alert("เลือกเดือนก่อน");
     const [y, mm] = m.split("-");
-    // เหมาะจะใช้ day = 1 เพื่อให้ analyzeWeek คืนสัปดาห์แรกของเดือน
     try {
     const res = await callApi("analyzeWeek", { year: y, month: mm, day: 1 });
     const d = res.data;
