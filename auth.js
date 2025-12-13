@@ -1,13 +1,12 @@
 // js/auth.js
 import { WEB_APP_URL } from "./config.js";
-async function call(action, payload = {}) {
-  const token = sessionStorage.getItem("session_token");
-  const params = new URLSearchParams({
-    action,
-    payload: JSON.stringify(payload)
-  });
-  if (token) params.append("token", token);
-  const res = await fetch(`${WEB_APP_URL}?${params.toString()}`);
+async function call(action, payload = {}, token = null) {
+  const params = new URLSearchParams();
+  params.set("action", action);
+  params.set("payload", JSON.stringify(payload));
+  if (token) params.set("token", token);
+  const url = `${WEB_APP_URL}?${params.toString()}`;
+  const res = await fetch(url);
   return await res.json();
 }
 
@@ -39,23 +38,26 @@ if (btnRegister) {
 }
 /* ---------- LOGIN (on login.html) ---------- */
 const btnLogin = document.getElementById("btnLogin");
-if (btnLogin) {
-  btnLogin.addEventListener("click", async () => {
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value;
-    if (!email || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
-    try {
-      const r = await call("login", { email, password });
-      if (r.error) return alert(r.error);
-      sessionStorage.setItem("session_token", r.data.token);
-      sessionStorage.setItem("userId", r.data.userId);
-      sessionStorage.setItem("userName", r.data.name || "");
+btnLogin.addEventListener("click", async () => {
+  const email = loginEmail.value.trim();
+  const password = loginPassword.value;
+  try {
+    const res = await fetch(WEB_APP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "login",
+        payload: { email, password }
+      })
+    });
+    const r = await res.json();
+    if (r.error) return alert(r.error);
+    sessionStorage.setItem("session_token", r.data.token);
     window.location = "record.html";
-    } catch (e) {
-      alert("เกิดข้อผิดพลาด: " + e.message);
-    }
-  });
-}
+  } catch (e) {
+    alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+  }
+});
 /* ---------- LOGOUT (same page protected) ---------- */
 const btnLogout = document.getElementById("btnLogout");
 if (btnLogout) {
