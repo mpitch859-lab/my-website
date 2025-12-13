@@ -20,7 +20,7 @@ if (btnRegister) {
     if (!name || !email || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
     if (password.length < 6) return alert("รหัสผ่านอย่างน้อย 6 ตัว");
     try {
-      const r = await call("register", { name, email, password });
+      const r = await call("register", { email, password });
       if (r.error) return alert(r.error);
       alert("สมัครสมาชิกสำเร็จ โปรดเข้าสู่ระบบ");
       window.location = "login.html";
