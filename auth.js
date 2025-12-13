@@ -1,5 +1,6 @@
 // js/auth.js
 import { WEB_APP_URL } from "./config.js";
+console.log("auth.js loaded");
 async function call(action, payload = {}, token = null) {
   const body = { action, payload };
   if (token) body.token = token;
@@ -103,4 +104,4 @@ if (btnReset) {
     } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
   });
 }
-console.log("auth.js loaded");
+
