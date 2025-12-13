@@ -38,11 +38,7 @@ if (btnLogin) {
     const password = document.getElementById("loginPassword").value;
     if (!email || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
     try {
-      const url =
-        WEB_APP_URL +
-        `?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
-      const res = await fetch(url);
-      const r = await res.json();
+      const r = await call("login", { email, password });
       if (r.error) return alert(r.error);
       sessionStorage.setItem("session_token", r.data.token);
       sessionStorage.setItem("userId", r.data.userId);
