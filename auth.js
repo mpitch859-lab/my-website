@@ -39,14 +39,19 @@ if (btnLogin) {
     const password = document.getElementById("loginPassword").value;
     if (!email || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
     try {
-      const r = await call("login", { email, password });
+      const url =
+        WEB_APP_URL +
+        `?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+      const res = await fetch(url);
+      const r = await res.json();
       if (r.error) return alert(r.error);
-      // r.data contains token, expiresAt, userId, name
       sessionStorage.setItem("session_token", r.data.token);
       sessionStorage.setItem("userId", r.data.userId);
       sessionStorage.setItem("userName", r.data.name || "");
       window.location = "record.html";
-    } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
+    } catch (e) {
+      alert("เกิดข้อผิดพลาด: " + e.message);
+    }
   });
 }
 /* ---------- LOGOUT (same page protected) ---------- */
