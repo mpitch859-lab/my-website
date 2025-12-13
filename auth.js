@@ -1,13 +1,12 @@
 // js/auth.js
 import { WEB_APP_URL } from "./config.js";
 async function call(action, payload = {}, token = null) {
-  const body = { action, payload };
-  if (token) body.token = token;
-  const res = await fetch(WEB_APP_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const params = new URLSearchParams();
+  params.append("action", action);
+  params.append("payload", JSON.stringify(payload));
+  if (token) params.append("token", token);
+  const url = `${WEB_APP_URL}?${params.toString()}`;
+  const res = await fetch(url);
   return await res.json();
 }
 /* ---------- REGISTER (on register.html) ---------- */
