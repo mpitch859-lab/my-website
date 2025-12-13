@@ -14,17 +14,18 @@ async function call(action, payload = {}, token = null) {
 const btnRegister = document.getElementById("btnRegister");
 if (btnRegister) {
   btnRegister.addEventListener("click", async () => {
-    const name = document.getElementById("regName").value.trim();
     const email = document.getElementById("regEmail").value.trim();
     const password = document.getElementById("regPassword").value;
-    if (!name || !email || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
+    if (!email || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
     if (password.length < 6) return alert("รหัสผ่านอย่างน้อย 6 ตัว");
     try {
-      const r = await call("register", { email, password });
+      const r = await call("register", { email, password })
       if (r.error) return alert(r.error);
       alert("สมัครสมาชิกสำเร็จ โปรดเข้าสู่ระบบ");
       window.location = "login.html";
-    } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
+    } catch (e) {
+      alert("เกิดข้อผิดพลาด: " + e.message);
+    }
   });
 }
 /* ---------- LOGIN (on login.html) ---------- */
