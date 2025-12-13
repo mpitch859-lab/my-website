@@ -103,3 +103,4 @@ if (btnReset) {
     } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
   });
 }
+console.log("auth.js loaded");
