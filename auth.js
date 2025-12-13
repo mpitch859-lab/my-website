@@ -5,9 +5,7 @@ async function call(action, payload = {}, token = null) {
   if (token) body.token = token;
   const res = await fetch(WEB_APP_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
   return await res.json();
@@ -43,7 +41,7 @@ if (btnLogin) {
       sessionStorage.setItem("session_token", r.data.token);
       sessionStorage.setItem("userId", r.data.userId);
       sessionStorage.setItem("userName", r.data.name || "");
-      window.location = "record.html";
+    window.location = "record.html";
     } catch (e) {
       alert("เกิดข้อผิดพลาด: " + e.message);
     }
