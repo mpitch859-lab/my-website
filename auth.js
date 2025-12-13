@@ -1,31 +1,41 @@
 // js/auth.js
 import { WEB_APP_URL } from "./config.js";
-async function call(action, payload = {}, token = null) {
-  const params = new URLSearchParams();
-  params.append("action", action);
-  params.append("payload", JSON.stringify(payload));
+async function call(action, payload = {}) {
+  const token = sessionStorage.getItem("session_token");
+  const params = new URLSearchParams({
+    action,
+    payload: JSON.stringify(payload)
+  });
   if (token) params.append("token", token);
-  const url = `${WEB_APP_URL}?${params.toString()}`;
-  const res = await fetch(url);
+  const res = await fetch(`${WEB_APP_URL}?${params.toString()}`);
   return await res.json();
 }
+
 /* ---------- REGISTER (on register.html) ---------- */
 const btnRegister = document.getElementById("btnRegister");
 if (btnRegister) {
-  btnRegister.addEventListener("click", async () => {
-    const email = document.getElementById("regEmail").value.trim();
-    const password = document.getElementById("regPassword").value;
-    if (!email || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
-    if (password.length < 6) return alert("รหัสผ่านอย่างน้อย 6 ตัว");
-    try {
-      const r = await call("register", { email, password })
-      if (r.error) return alert(r.error);
-      alert("สมัครสมาชิกสำเร็จ โปรดเข้าสู่ระบบ");
-      window.location = "login.html";
-    } catch (e) {
-      alert("เกิดข้อผิดพลาด: " + e.message);
-    }
+  btnRegister.addEventListener("click", () => {
+  const email = document.getElementById("regEmail").value.trim();
+  const password = document.getElementById("regPassword").value.trim();
+  const params = new URLSearchParams({
+    action: "register",
+    payload: JSON.stringify({ email, password })
   });
+  fetch(`${WEB_APP_URL}?${params.toString()}`)
+    .then(res => res.json())
+    .then(result => {
+      if (result.error) {
+        alert(result.error);
+      } else {
+        alert("สมัครสมาชิกสำเร็จ");
+        window.location.href = "login.html";
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+    });
+});
 }
 /* ---------- LOGIN (on login.html) ---------- */
 const btnLogin = document.getElementById("btnLogin");
