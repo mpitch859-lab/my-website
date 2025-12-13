@@ -1,9 +1,17 @@
 // js/auth.js
-const res = await fetch(WEB_APP_URL, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(body),
-});
+async function call(action, payload = {}, token = null) {
+  const body = { action, payload };
+  if (token) body.token = token;
+  await fetch(WEB_APP_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body),
+  });
+}
+return { ok: true };
 return await res.json();
 /* ---------- REGISTER (on register.html) ---------- */
 const btnRegister = document.getElementById("btnRegister");
