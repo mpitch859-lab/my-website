@@ -38,6 +38,7 @@ if (btnRegister) {
 }
 /* ---------- LOGIN (on login.html) ---------- */
 const btnLogin = document.getElementById("btnLogin");
+if (btnLogin) {
 btnLogin.addEventListener("click", async () => {
   const email = loginEmail.value.trim();
   const password = loginPassword.value;
@@ -58,6 +59,7 @@ btnLogin.addEventListener("click", async () => {
     alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
   }
 });
+}
 /* ---------- LOGOUT (same page protected) ---------- */
 const btnLogout = document.getElementById("btnLogout");
 if (btnLogout) {
