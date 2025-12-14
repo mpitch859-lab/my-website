@@ -1,14 +1,12 @@
-// js/auth.js
 import { WEB_APP_URL } from "./config.js";
 
-/* ---------- CORE CALL (GET only) ---------- */
 async function call(action, payload = {}, token = null) {
   const params = new URLSearchParams();
   params.set("action", action);
   params.set("payload", JSON.stringify(payload));
   if (token) params.set("token", token);
   const url = `${WEB_APP_URL}?${params.toString()}`;
-  const res = await fetch(url);
+  const res = await fetch(url); // ← GET ONLY
   return await res.json();
 }
 
@@ -16,17 +14,12 @@ async function call(action, payload = {}, token = null) {
 const btnRegister = document.getElementById("btnRegister");
 if (btnRegister) {
   btnRegister.addEventListener("click", async () => {
-    const email = document.getElementById("regEmail").value.trim();
-    const password = document.getElementById("regPassword").value.trim();
-    if (!email || !password) return alert("กรอกข้อมูลให้ครบ");
-    try {
-      const r = await call("register", { email, password });
-      if (r.error) return alert(r.error);
-      alert("สมัครสมาชิกสำเร็จ");
-      window.location.href = "login.html";
-    } catch {
-      alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
-    }
+    const email = regEmail.value.trim();
+    const password = regPassword.value.trim();
+    const r = await call("register", { email, password });
+    if (r.error) return alert(r.error);
+    alert("สมัครสมาชิกสำเร็จ");
+    location.href = "login.html";
   });
 }
 
@@ -34,18 +27,12 @@ if (btnRegister) {
 const btnLogin = document.getElementById("btnLogin");
 if (btnLogin) {
   btnLogin.addEventListener("click", async () => {
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value;
-    if (!email || !password) return alert("กรอกข้อมูลให้ครบ");
-    try {
-      const r = await call("login", { email, password });
-      if (r.error) return alert(r.error);
-      sessionStorage.setItem("session_token", r.data.token);
-      sessionStorage.setItem("userId", r.data.userId || "");
-      window.location.href = "record.html";
-    } catch {
-      alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
-    }
+    const email = loginEmail.value.trim();
+    const password = loginPassword.value;
+    const r = await call("login", { email, password });
+    if (r.error) return alert(r.error);
+    sessionStorage.setItem("session_token", r.data.token);
+    location.href = "record.html";
   });
 }
 
