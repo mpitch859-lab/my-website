@@ -1,5 +1,7 @@
 // js/auth.js
 import { WEB_APP_URL } from "./config.js";
+
+/* ---------- CORE CALL (GET only) ---------- */
 async function call(action, payload = {}, token = null) {
   const params = new URLSearchParams();
   params.set("action", action);
@@ -10,98 +12,80 @@ async function call(action, payload = {}, token = null) {
   return await res.json();
 }
 
-/* ---------- REGISTER (on register.html) ---------- */
+/* ---------- REGISTER ---------- */
 const btnRegister = document.getElementById("btnRegister");
 if (btnRegister) {
-  btnRegister.addEventListener("click", () => {
-  const email = document.getElementById("regEmail").value.trim();
-  const password = document.getElementById("regPassword").value.trim();
-  const params = new URLSearchParams({
-    action: "register",
-    payload: JSON.stringify({ email, password })
-  });
-  fetch(`${WEB_APP_URL}?${params.toString()}`)
-    .then(res => res.json())
-    .then(result => {
-      if (result.error) {
-        alert(result.error);
-      } else {
-        alert("สมัครสมาชิกสำเร็จ");
-        window.location.href = "login.html";
-      }
-    })
-    .catch(err => {
-      console.error(err);
+  btnRegister.addEventListener("click", async () => {
+    const email = document.getElementById("regEmail").value.trim();
+    const password = document.getElementById("regPassword").value.trim();
+    if (!email || !password) return alert("กรอกข้อมูลให้ครบ");
+    try {
+      const r = await call("register", { email, password });
+      if (r.error) return alert(r.error);
+      alert("สมัครสมาชิกสำเร็จ");
+      window.location.href = "login.html";
+    } catch {
       alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
-    });
-});
+    }
+  });
 }
-/* ---------- LOGIN (on login.html) ---------- */
+
+/* ---------- LOGIN ---------- */
 const btnLogin = document.getElementById("btnLogin");
 if (btnLogin) {
-btnLogin.addEventListener("click", async () => {
-  const email = loginEmail.value.trim();
-  const password = loginPassword.value;
-  try {
-    const res = await fetch(WEB_APP_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "login",
-        payload: { email, password }
-      })
-    });
-    const r = await res.json();
-    if (r.error) return alert(r.error);
-    sessionStorage.setItem("session_token", r.data.token);
-    window.location = "record.html";
-  } catch (e) {
-    alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
-  }
-});
+  btnLogin.addEventListener("click", async () => {
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    if (!email || !password) return alert("กรอกข้อมูลให้ครบ");
+    try {
+      const r = await call("login", { email, password });
+      if (r.error) return alert(r.error);
+      sessionStorage.setItem("session_token", r.data.token);
+      sessionStorage.setItem("userId", r.data.userId || "");
+      window.location.href = "record.html";
+    } catch {
+      alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+    }
+  });
 }
-/* ---------- LOGOUT (same page protected) ---------- */
+
+/* ---------- LOGOUT ---------- */
 const btnLogout = document.getElementById("btnLogout");
 if (btnLogout) {
   btnLogout.addEventListener("click", async () => {
     const token = sessionStorage.getItem("session_token");
-    if (token) {
-      await call("logout", {});
-    }
-    sessionStorage.removeItem("session_token");
-    sessionStorage.removeItem("userId");
-    sessionStorage.removeItem("userName");
-    window.location = "login.html";
+    if (token) await call("logout", {}, token);
+    sessionStorage.clear();
+    window.location.href = "login.html";
   });
 }
-/* ---------- PROTECT PAGES (client-side) ---------- */
+
+/* ---------- PROTECT PAGES ---------- */
 const protectedPages = ["record.html", "analysis.html", "calendar.html"];
 const path = window.location.pathname.split("/").pop();
 if (protectedPages.includes(path)) {
   const token = sessionStorage.getItem("session_token");
-  if (!token) {
-    window.location = "login.html";
-  } else {
-    // optionally show user's name in UI
-    const nameEl = document.getElementById("displayName");
-    if (nameEl) nameEl.textContent = sessionStorage.getItem("userName") || "";
-  }
+  if (!token) window.location.href = "login.html";
 }
-/* ---------- FORGOT PASSWORD (forgot.html) ---------- */
+
+/* ---------- FORGOT PASSWORD ---------- */
 const btnForgot = document.getElementById("btnForgot");
 if (btnForgot) {
   btnForgot.addEventListener("click", async () => {
     const email = document.getElementById("forgotEmail").value.trim();
-    if (!email) return alert("กรุณากรอกอีเมล");
+    if (!email) return alert("กรอกอีเมล");
     try {
       const r = await call("forgotPassword", { email });
       if (r.error) return alert(r.error);
-      alert("ส่งโค้ดรีเซ็ตไปที่อีเมลแล้ว (ตรวจสอบกล่องจดหมาย)");
-      window.location = "reset.html";
-    } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
+      alert("ส่งโค้ดรีเซ็ตแล้ว");
+      window.location.href = "reset.html";
+    } catch {
+      alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+    }
   });
 }
-/* ---------- RESET PASSWORD (reset.html) ---------- */
+
+/* ---------- RESET PASSWORD ---------- */
 const btnReset = document.getElementById("btnReset");
 if (btnReset) {
   btnReset.addEventListener("click", async () => {
@@ -112,8 +96,10 @@ if (btnReset) {
     try {
       const r = await call("resetPassword", { email, code, newPassword });
       if (r.error) return alert(r.error);
-      alert("รีเซ็ตรหัสผ่านสำเร็จ โปรดล็อกอินอีกครั้ง");
-      window.location = "login.html";
-    } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
+      alert("เปลี่ยนรหัสผ่านสำเร็จ");
+      window.location.href = "login.html";
+    } catch {
+      alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+    }
   });
 }
