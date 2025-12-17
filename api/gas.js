@@ -1,14 +1,9 @@
 export default async function handler(req, res) {
-try {
-    const GAS_URL =
-    "https://script.google.com/macros/s/AKfycbxF3orxDopiJL0uhXfwTrju82fqcm_QNjIzU-__PTAwEmz55-5hbY4E0QwN4b8_vvk-/exec";
-    const query = new URLSearchParams(req.query).toString();
-    const url = `${GAS_URL}?${query}`;
-    const r = await fetch(url);
-    const text = await r.text();
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.status(200).send(text);
-} catch (err) {
-    res.status(500).json({ error: err.message });
-}
+const gasUrl = "https://script.google.com/macros/s/AKfycbyxqppbVZ08wseHHDFSK5RD39G21DfKEXI6kMUOI8nSKTnu5wDLiMosNbs685vvbiQ1/exec";
+const qs = new URLSearchParams(req.query).toString();
+const response = await fetch(`${gasUrl}?${qs}`);
+const text = await response.text();
+res.setHeader("Access-Control-Allow-Origin", "*");
+res.setHeader("Content-Type", "application/json");
+res.status(200).send(text);
 }

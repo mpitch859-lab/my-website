@@ -1,11 +1,10 @@
 import { API_URL } from "./config.js";
 
 async function call(action, payload = {}) {
-  const token = sessionStorage.getItem("session_token");
-  const params = new URLSearchParams();
-  params.set("action", action);
-  params.set("payload", JSON.stringify(payload));
-  if (token) params.set("token", token);
+  const params = new URLSearchParams({
+    action,
+    payload: JSON.stringify(payload)
+  });
   const res = await fetch(`${API_URL}?${params.toString()}`);
   return await res.json();
 }
@@ -23,7 +22,9 @@ btnRegister.addEventListener("click", async () => {
 });
 
 /* ---------- LOGIN ---------- */
-btnLogin.addEventListener("click", async () => {
+const btnLogin = document.getElementById("btnLogin");
+if (btnLogin) {
+  btnLogin.addEventListener("click", async () => {
   const email = loginEmail.value.trim();
   const password = loginPassword.value;
   const r = await call("login", { email, password });
@@ -31,6 +32,7 @@ btnLogin.addEventListener("click", async () => {
   sessionStorage.setItem("session_token", r.data.token);
   window.location = "record.html";
 });
+}
 
 /* ---------- LOGOUT ---------- */
 btnLogout.addEventListener("click", async () => {
