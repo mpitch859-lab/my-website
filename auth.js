@@ -22,16 +22,36 @@ btnRegister.addEventListener("click", async () => {
 });
 
 /* ---------- LOGIN ---------- */
+import { WEB_APP_URL } from "./config.js";
+
 const btnLogin = document.getElementById("btnLogin");
+
 if (btnLogin) {
   btnLogin.addEventListener("click", async () => {
-  const email = loginEmail.value.trim();
-  const password = loginPassword.value;
-  const r = await call("login", { email, password });
-  if (r.error) return alert(r.error);
-  sessionStorage.setItem("session_token", r.data.token);
-  window.location = "record.html";
-});
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    if (!email || !password) {
+      alert("กรุณากรอกข้อมูลให้ครบ");
+      return;
+    }
+    try {
+      const params = new URLSearchParams({
+        action: "login",
+        payload: JSON.stringify({ email, password })
+      });
+      const res = await fetch(`${WEB_APP_URL}?${params.toString()}`);
+      const data = await res.json();
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+      sessionStorage.setItem("session_token", data.data.token);
+      window.location.href = "record.html";
+    } catch (err) {
+      console.error(err);
+      alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+    }
+  });
 }
 
 /* ---------- LOGOUT ---------- */
