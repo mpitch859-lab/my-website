@@ -2,13 +2,19 @@ import { API_URL } from "./config.js";
 
 /* ---------- API CALL ---------- */
 async function call(action, payload = {}) {
-  const token = sessionStorage.getItem("session_token");
-  const params = new URLSearchParams({
-    action,
-    payload: JSON.stringify(payload),
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action,
+      payload
+    })
   });
-  if (token) params.set("token", token);
-  const res = await fetch(`${API_URL}?${params.toString()}`);
+  if (!res.ok) {
+    throw new Error("Network error");
+  }
   return await res.json();
 }
 
@@ -18,11 +24,15 @@ if (btnRegister) {
   btnRegister.addEventListener("click", async () => {
     const email = document.getElementById("regEmail").value.trim();
     const password = document.getElementById("regPassword").value.trim();
-    if (!email || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
-    const r = await call("register", { email, password });
-    if (r.error) return alert(r.error);
-    alert("สมัครสมาชิกสำเร็จ");
-    window.location.href = "login.html";
+    try {
+      const r = await call("register", { email, password });
+      if (r.error) return alert(r.error);
+      alert("สมัครสมาชิกสำเร็จ");
+      window.location.href = "login.html";
+    } catch (e) {
+      console.error(e);
+      alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+    }
   });
 }
 
