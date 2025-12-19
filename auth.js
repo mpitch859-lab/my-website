@@ -1,20 +1,14 @@
 import { API_URL } from "./config.js";
+
 /* ---------- API CALL ---------- */
 async function call(action, payload = {}) {
   const token = sessionStorage.getItem("session_token");
-  // Construct the body for a POST request
-  const bodyData = {
+  const params = new URLSearchParams({
     action,
     payload: JSON.stringify(payload),
-  };
-  if (token) bodyData.token = token;
-  const res = await fetch(API_URL, {
-    method: "POST", // Change method to POST
-    headers: {
-      "Content-Type": "application/json", // Specify content type as JSON
-    },
-    body: JSON.stringify(bodyData), // Send data in the body
   });
+  if (token) params.set("token", token);
+  const res = await fetch(`${API_URL}?${params.toString()}`);
   return await res.json();
 }
 
