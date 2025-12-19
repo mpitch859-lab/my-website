@@ -7,21 +7,16 @@ async function call(action, payload = {}) {
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      action,
-      payload
-    })
+    body: JSON.stringify({ action, payload })
   });
-  if (!res.ok) {
-    throw new Error("Network error");
-  }
   return await res.json();
 }
 
 /* ---------- REGISTER ---------- */
 const btnRegister = document.getElementById("btnRegister");
 if (btnRegister) {
-  btnRegister.addEventListener("click", async () => {
+  btnRegister.addEventListener("click", async (e) => {
+    e.preventDefault();
     const email = document.getElementById("regEmail").value.trim();
     const password = document.getElementById("regPassword").value.trim();
     try {
@@ -29,13 +24,12 @@ if (btnRegister) {
       if (r.error) return alert(r.error);
       alert("สมัครสมาชิกสำเร็จ");
       window.location.href = "login.html";
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      console.error(err);
       alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
     }
   });
 }
-
 
 /* ---------- LOGIN ---------- */
 const btnLogin = document.getElementById("btnLogin");
