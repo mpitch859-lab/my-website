@@ -1,16 +1,4 @@
-import { API_URL } from "./config.js";
-
-/* ---------- API CALL ---------- */
-async function call(action, payload = {}) {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ action, payload })
-  });
-  return await res.json();
-}
+import { callApi } from "./api-client.js";
 
 /* ---------- REGISTER ---------- */
 const btnRegister = document.getElementById("btnRegister");
@@ -20,7 +8,7 @@ if (btnRegister) {
     const email = document.getElementById("regEmail").value.trim();
     const password = document.getElementById("regPassword").value.trim();
     try {
-      const r = await call("register", { email, password });
+      const r = await callApi("register", { email, password });
       if (r.error) return alert(r.error);
       alert("สมัครสมาชิกสำเร็จ");
       window.location.href = "login.html";
@@ -38,7 +26,7 @@ if (btnLogin) {
     const email = document.getElementById("loginEmail").value.trim();
     const password = document.getElementById("loginPassword").value;
     if (!email || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
-    const r = await call("login", { email, password });
+    const r = await callApi("login", { email, password });
     if (r.error) return alert(r.error);
     sessionStorage.setItem("session_token", r.data.token);
     window.location.href = "record.html";
@@ -69,7 +57,7 @@ if (btnForgot) {
   btnForgot.addEventListener("click", async () => {
     const email = document.getElementById("forgotEmail").value.trim();
     if (!email) return alert("กรอกอีเมล");
-    const r = await call("forgotPassword", { email });
+    const r = await callApi("forgotPassword", { email });
     if (r.error) return alert(r.error);
     alert("ส่งโค้ดรีเซ็ตแล้ว");
     window.location.href = "reset.html";
@@ -84,7 +72,7 @@ if (btnReset) {
     const code = document.getElementById("resetCode").value.trim();
     const newPassword = document.getElementById("newPassword").value;
     if (!email || !code || !newPassword) return alert("กรอกข้อมูลให้ครบ");
-    const r = await call("resetPassword", { email, code, newPassword });
+    const r = await callApi("resetPassword", { email, code, newPassword });
     if (r.error) return alert(r.error);
     alert("เปลี่ยนรหัสผ่านสำเร็จ");
     window.location.href = "login.html";
