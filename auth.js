@@ -1,3 +1,4 @@
+// js/auth.js
 import { callApi } from "./api-client.js";
 
 /* ---------- REGISTER ---------- */
@@ -37,7 +38,7 @@ if (btnLogin) {
 const btnLogout = document.getElementById("btnLogout");
 if (btnLogout) {
   btnLogout.addEventListener("click", async () => {
-    await call("logout");
+    await callApi("logout");
     sessionStorage.clear();
     window.location.href = "login.html";
   });

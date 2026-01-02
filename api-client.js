@@ -4,18 +4,22 @@ export async function callApi(action, payload = {}) {
     const token = sessionStorage.getItem("session_token");
     const res = await fetch(API_URL, {
         method: "POST",
-        mode: "cors",
         headers: {
-            "Content-Type": "text/plain;charset=utf-8"
+            "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            action: action,
-            payload: payload,
-            token: token
+            action,
+            payload,
+            token
         })
     });
-    if (!res.ok) throw new Error("Network error หรือ URL ของ GAS ไม่ถูกต้อง");
-    const result = await res.json();
-    if (result.error) throw new Error(result.error);
-    return result;
+    const text = await res.text();
+    let data;
+    try {
+        data = JSON.parse(text);
+    } catch {
+        throw new Error("GAS ไม่ได้ส่ง JSON กลับมา");
+    }
+    if (data.error) throw new Error(data.error);
+    return data;
 }
