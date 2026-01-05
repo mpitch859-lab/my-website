@@ -8,14 +8,13 @@ if (btnRegister) {
     e.preventDefault();
     const email = document.getElementById("regEmail").value.trim();
     const password = document.getElementById("regPassword").value.trim();
+    if (!email || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
     try {
-      const r = await callApi("register", { email, password });
-      if (r.error) return alert(r.error);
+      await callApi("register", { email, password });
       alert("สมัครสมาชิกสำเร็จ");
       window.location.href = "login.html";
     } catch (err) {
-      console.error(err);
-      alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+      alert(err.message);
     }
   });
 }
@@ -25,20 +24,24 @@ const btnLogin = document.getElementById("btnLogin");
 if (btnLogin) {
   btnLogin.addEventListener("click", async () => {
     const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value;
+    const password = document.getElementById("loginPassword").value.trim();
     if (!email || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
-    const r = await callApi("login", { email, password });
-    if (r.error) return alert(r.error);
-    sessionStorage.setItem("session_token", r.data.token);
-    window.location.href = "record.html";
+
+    try {
+      const data = await callApi("login", { email, password });
+      sessionStorage.setItem("session_token", data.token);
+      alert("เข้าสู่ระบบสำเร็จ");
+      window.location.href = "record.html";
+    } catch (err) {
+      alert(err.message);
+    }
   });
 }
 
 /* ---------- LOGOUT ---------- */
 const btnLogout = document.getElementById("btnLogout");
 if (btnLogout) {
-  btnLogout.addEventListener("click", async () => {
-    await callApi("logout");
+  btnLogout.addEventListener("click", () => {
     sessionStorage.clear();
     window.location.href = "login.html";
   });
@@ -50,32 +53,4 @@ const path = window.location.pathname.split("/").pop();
 if (protectedPages.includes(path)) {
   const token = sessionStorage.getItem("session_token");
   if (!token) window.location.href = "login.html";
-}
-
-/* ---------- FORGOT PASSWORD ---------- */
-const btnForgot = document.getElementById("btnForgot");
-if (btnForgot) {
-  btnForgot.addEventListener("click", async () => {
-    const email = document.getElementById("forgotEmail").value.trim();
-    if (!email) return alert("กรอกอีเมล");
-    const r = await callApi("forgotPassword", { email });
-    if (r.error) return alert(r.error);
-    alert("ส่งโค้ดรีเซ็ตแล้ว");
-    window.location.href = "reset.html";
-  });
-}
-
-/* ---------- RESET PASSWORD ---------- */
-const btnReset = document.getElementById("btnReset");
-if (btnReset) {
-  btnReset.addEventListener("click", async () => {
-    const email = document.getElementById("resetEmail").value.trim();
-    const code = document.getElementById("resetCode").value.trim();
-    const newPassword = document.getElementById("newPassword").value;
-    if (!email || !code || !newPassword) return alert("กรอกข้อมูลให้ครบ");
-    const r = await callApi("resetPassword", { email, code, newPassword });
-    if (r.error) return alert(r.error);
-    alert("เปลี่ยนรหัสผ่านสำเร็จ");
-    window.location.href = "login.html";
-  });
 }
