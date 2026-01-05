@@ -1,5 +1,3 @@
 // js/config.js
-export const CONFIG = {
-    GAS_URL:"https://script.google.com/macros/s/AKfycbwQJdO-ZiaI1T_Nij0wno7n1gZMf_WC7uK-ptItZdQTvAOvmnUpbNYUiAM5wDSkAbIH/exec",
-    TIMEOUT_MS: 15000
-};
+// js/config.js
+export const GAS_URL ="https://script.google.com/macros/s/AKfycbxDiW_aPa25-6eqUmOnAWjpF1KhZU7TD8p6Nb7tBSEwFK0wrPg7bCQLMobIo1Ykz-lA/exec";
