@@ -1,2 +1,5 @@
 // js/config.js
-export const API_URL = "https://script.google.com/macros/s/AKfycby2HWp_qnvJsy_1jK4zizeWflaDt1OqoOe242fEn4dupP7p6NWzbCDc_Hop1EpFCKLd/exec";
+export const CONFIG = {
+    GAS_URL:"https://script.google.com/macros/s/AKfycbwQJdO-ZiaI1T_Nij0wno7n1gZMf_WC7uK-ptItZdQTvAOvmnUpbNYUiAM5wDSkAbIH/exec",
+    TIMEOUT_MS: 15000
+};

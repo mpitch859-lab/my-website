@@ -1,6 +1,23 @@
 // js/auth.js
 import { callApi } from "./api-client.js";
 
+/* ---------- LOGIN ---------- */
+const btnLogin = document.getElementById("btnLogin");
+if (btnLogin) {
+  btnLogin.addEventListener("click", async () => {
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    try {
+      const r = await callApi("login", { email, password });
+      if (r.error) return alert(r.error);
+      sessionStorage.setItem("session_token", r.data.token);
+      window.location.href = "record.html";
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+}
+
 /* ---------- REGISTER ---------- */
 const btnRegister = document.getElementById("btnRegister");
 if (btnRegister) {
@@ -8,30 +25,11 @@ if (btnRegister) {
     e.preventDefault();
     const email = document.getElementById("regEmail").value.trim();
     const password = document.getElementById("regPassword").value.trim();
-    if (!email || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
     try {
-      await callApi("register", { email, password });
+      const r = await callApi("register", { email, password });
+      if (r.error) return alert(r.error);
       alert("สมัครสมาชิกสำเร็จ");
       window.location.href = "login.html";
-    } catch (err) {
-      alert(err.message);
-    }
-  });
-}
-
-/* ---------- LOGIN ---------- */
-const btnLogin = document.getElementById("btnLogin");
-if (btnLogin) {
-  btnLogin.addEventListener("click", async () => {
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
-    if (!email || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
-
-    try {
-      const data = await callApi("login", { email, password });
-      sessionStorage.setItem("session_token", data.token);
-      alert("เข้าสู่ระบบสำเร็จ");
-      window.location.href = "record.html";
     } catch (err) {
       alert(err.message);
     }
