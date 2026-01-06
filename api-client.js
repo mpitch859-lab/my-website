@@ -3,30 +3,24 @@ import { GAS_URL } from "./config.js";
 
 export async function callApi(action, data = {}) {
     const token = sessionStorage.getItem("session_token");
-    const payload = {
-        action,
-        token, // แนบ token ไปด้วยเสมอ
-        ...data
-    };
+    const payload = JSON.stringify({ action, token, ...data });
 
     try {
         const response = await fetch(GAS_URL, {
             method: "POST",
-            mode: "cors",
-            // ไม่ใส่ headers Content-Type เพื่อเลี่ยง Preflight (OPTIONS) ที่จุกจิก
-            body: JSON.stringify(payload)
+            mode: "cors", // ต้องเปิด cors
+            body: payload,
+            // ห้ามใส่ Header Content-Type เพื่อลดปัญหา Preflight
         });
 
+        if (!response.ok) throw new Error("เครือข่ายขัดข้อง");
         const result = await response.json();
         
-        if (!result.success) {
-            throw new Error(result.error || "เกิดข้อผิดพลาดไม่ทราบสาเหตุ");
-        }
-        
-        return result; // คืนค่า { success: true, data: ... }
+        if (!result.success) throw new Error(result.error);
+        return result;
     } catch (error) {
-        console.error("Fetch Error:", error);
-        alert("การเชื่อมต่อผิดพลาด: " + error.message);
+        console.error("API Error:", error);
+        alert(error.message);
         throw error;
     }
 }
