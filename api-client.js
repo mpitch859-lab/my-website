@@ -1,6 +1,6 @@
 import { callApi } from "./api-client.js";
 
-async function initCalendar() {
+export async function initCalendar() {
     try {
         // 1. ดึงข้อมูลจาก API (จะแนบ Token ให้อัตโนมัติจาก api-client ที่เราแก้กันก่อนหน้า)
         const res = await callApi("list", {});
