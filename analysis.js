@@ -1,8 +1,6 @@
-// js/analysis.js
 import { callApi } from "./api-client.js";
 
 const btnAnalyze = document.getElementById("btnAnalyze");
-const btnAnalyzeWeek = document.getElementById("btnAnalyzeWeek");
 const monthInput = document.getElementById("monthSelect");
 const analysisText = document.getElementById("analysisText");
 const analysisTable = document.getElementById("analysisTable");
@@ -11,17 +9,19 @@ let chartInstance = null;
 
 // ตั้งค่าเดือนปัจจุบันใน Input
 const now = new Date();
-if (monthInput) monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+if (monthInput) {
+    monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+}
 
-// ฟังก์ชันวาดกราฟ (Reusable)
+// ฟังก์ชันวาดกราฟ
 function renderChart(income, expense) {
     if (chartInstance) chartInstance.destroy();
     if (income === 0 && expense === 0) {
-        analysisText.innerHTML += "<br><small style='color:red'>(ไม่มีข้อมูลสำหรับช่วงเวลานี้)</small>";
+        analysisText.innerHTML += "<br><small style='color:red'>(ไม่มีข้อมูลสำหรับเดือนนี้)</small>";
         return;
     }
     chartInstance = new Chart(chartEl.getContext('2d'), {
-        type: 'doughnut', // เปลี่ยนเป็นโดนัทจะดูทันสมัยกว่า
+        type: 'doughnut',
         data: {
             labels: ['รายรับ', 'รายจ่าย'],
             datasets: [{
@@ -29,55 +29,75 @@ function renderChart(income, expense) {
                 backgroundColor: ['#28a745', '#dc3545']
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
     });
 }
 
-// วิเคราะห์รายเดือน
+// วิเคราะห์รายเดือนอย่างเดียว
 if (btnAnalyze) {
     btnAnalyze.addEventListener("click", async () => {
         const m = monthInput.value;
+        const token = sessionStorage.getItem("session_token"); // ดึง Token มายืนยันตัวตน
         if (!m) return alert("กรุณาเลือกเดือน");
+        if (!token) return window.location.href = "login.html";
         try {
-            const res = await callApi("analyze", { month: m });
-            const { income, expense } = res.data;
+            // ส่ง Action "analyze" พร้อม token และเดือน
+            const res = await callApi("analyze", { token, month: m });
             
-            analysisText.innerHTML = `
-                <b>ผลสรุปรายเดือน</b><br>
-                รายรับ: <span class="text-success">${income.toLocaleString()}</span> บาท<br>
-                รายจ่าย: <span class="text-danger">${expense.toLocaleString()}</span> บาท<br>
-                คงเหลือ: <b>${(income - expense).toLocaleString()}</b> บาท
-            `;
-            
-            renderChart(income, expense);
-            analysisTable.innerHTML = `
-                <table class="table">
-                    <thead><tr><th>ประเภท</th><th>จำนวน</th></tr></thead>
-                    <tbody>
-                        <tr><td>รายรับ</td><td class="text-success">${income.toLocaleString()}</td></tr>
-                        <tr><td>รายจ่าย</td><td class="text-danger">${expense.toLocaleString()}</td></tr>
-                    </tbody>
-                </table>`;
-        } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
+            if (res.success) {
+                const { income, expense } = res.data;
+                
+                // แสดงข้อความสรุป
+                analysisText.innerHTML = `
+                    <div style="margin-top:15px;">
+                        <b>ผลสรุปรายเดือน</b><br>
+                        รายรับ: <span class="text-success">${income.toLocaleString()}</span> บาท<br>
+                        รายจ่าย: <span class="text-danger">${expense.toLocaleString()}</span> บาท<br>
+                        คงเหลือ: <b>${(income - expense).toLocaleString()}</b> บาท
+                    </div>
+                `;
+                
+                // วาดกราฟและตาราง
+                renderChart(income, expense);
+                renderTable(income, expense);
+            } else {
+                alert("เกิดข้อผิดพลาด: " + res.error);
+            }
+        } catch (e) {
+            alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+        }
     });
 }
 
-// วิเคราะห์รายสัปดาห์
-if (btnAnalyzeWeek) {
-    btnAnalyzeWeek.addEventListener("click", async () => {
-        const m = monthInput.value;
-        const [y, mm] = m.split("-");
-        try {
-            const res = await callApi("analyzeWeek", { year: parseInt(y), month: parseInt(mm), day: 1 });
-            const d = res.data;
-            
-            analysisText.innerHTML = `
-                <b>ผลสรุปสัปดาห์นี้</b><br>
-                <small>${new Date(d.weekStart).toLocaleDateString('th-TH')} - ${new Date(d.weekEnd).toLocaleDateString('th-TH')}</small><br>
-                รายรับ: ${d.income.toLocaleString()} บาท | รายจ่าย: ${d.expense.toLocaleString()} บาท
-            `;
-            
-            renderChart(d.income, d.expense);
-        } catch (e) { alert(e.message); }
-    });
+// ฟังก์ชันสร้างตารางสรุป
+function renderTable(income, expense) {
+    analysisTable.innerHTML = `
+        <table class="table" style="width:100%; margin-top:20px; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #ddd;">
+                    <th style="text-align:left; padding:8px;">ประเภท</th>
+                    <th style="text-align:right; padding:8px;">จำนวนเงิน</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding:8px;">รายรับ (Income)</td>
+                    <td style="text-align:right; padding:8px;" class="text-success">${income.toLocaleString()}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding:8px;">รายจ่าย (Expense)</td>
+                    <td style="text-align:right; padding:8px;" class="text-danger">${expense.toLocaleString()}</td>
+                </tr>
+                <tr style="background:#f9f9f9; font-weight:bold;">
+                    <td style="padding:8px;">คงเหลือสุทธิ</td>
+                    <td style="text-align:right; padding:8px;">${(income - expense).toLocaleString()}</td>
+                </tr>
+            </tbody>
+        </table>`;
 }
