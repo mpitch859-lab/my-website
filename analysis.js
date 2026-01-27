@@ -43,8 +43,9 @@ function renderChart(income, expense) {
 if (btnAnalyze) {
     btnAnalyze.addEventListener("click", async () => {
         const m = monthInput.value;
-        const token = sessionStorage.getItem("session_token"); // ดึง Token มายืนยันตัวตน
         if (!m) return alert("กรุณาเลือกเดือน");
+        const token = sessionStorage.getItem("session_token"); // ดึง Token มายืนยันตัวตน
+        const res = await callApi("analyze", { token, month: m });
         if (!token) return window.location.href = "login.html";
         try {
             // ส่ง Action "analyze" พร้อม token และเดือน
