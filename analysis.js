@@ -1,3 +1,4 @@
+//api-client.js
 import { callApi } from "./api-client.js";
 
 const btnAnalyze = document.getElementById("btnAnalyze");
@@ -7,17 +8,19 @@ const analysisTable = document.getElementById("analysisTable");
 const chartEl = document.getElementById("chart");
 let chartInstance = null;
 
-// ตั้งค่าเดือนปัจจุบันใน Input
+// 1. ตั้งค่าเดือนปัจจุบันใน Input (เช่น 2026-01)
 const now = new Date();
 if (monthInput) {
     monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 }
 
-// ฟังก์ชันวาดกราฟ
+// 2. ฟังก์ชันวาดกราฟวงกลม
 function renderChart(income, expense) {
     if (chartInstance) chartInstance.destroy();
+    
+    // ถ้าไม่มีข้อมูลเลย ให้แจ้งเตือนและไม่วาดกราฟ
     if (income === 0 && expense === 0) {
-        analysisText.innerHTML += "<br><small style='color:red'>(ไม่มีข้อมูลสำหรับเดือนนี้)</small>";
+        analysisText.innerHTML += "<br><small style='color:red'>(ไม่พบข้อมูลในเดือนที่เลือก)</small>";
         return;
     }
     chartInstance = new Chart(chartEl.getContext('2d'), {
@@ -39,44 +42,7 @@ function renderChart(income, expense) {
     });
 }
 
-// วิเคราะห์รายเดือนอย่างเดียว
-if (btnAnalyze) {
-    btnAnalyze.addEventListener("click", async () => {
-        const m = monthInput.value;
-        if (!m) return alert("กรุณาเลือกเดือน");
-        const token = sessionStorage.getItem("session_token"); // ดึง Token มายืนยันตัวตน
-        const res = await callApi("analyze", { token, month: m });
-        if (!token) return window.location.href = "login.html";
-        try {
-            // ส่ง Action "analyze" พร้อม token และเดือน
-            const res = await callApi("analyze", { token, month: m });
-            
-            if (res.success) {
-                const { income, expense } = res.data;
-                
-                // แสดงข้อความสรุป
-                analysisText.innerHTML = `
-                    <div style="margin-top:15px;">
-                        <b>ผลสรุปรายเดือน</b><br>
-                        รายรับ: <span class="text-success">${income.toLocaleString()}</span> บาท<br>
-                        รายจ่าย: <span class="text-danger">${expense.toLocaleString()}</span> บาท<br>
-                        คงเหลือ: <b>${(income - expense).toLocaleString()}</b> บาท
-                    </div>
-                `;
-                
-                // วาดกราฟและตาราง
-                renderChart(income, expense);
-                renderTable(income, expense);
-            } else {
-                alert("เกิดข้อผิดพลาด: " + res.error);
-            }
-        } catch (e) {
-            alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
-        }
-    });
-}
-
-// ฟังก์ชันสร้างตารางสรุป
+// 3. ฟังก์ชันสร้างตารางสรุป
 function renderTable(income, expense) {
     analysisTable.innerHTML = `
         <table class="table" style="width:100%; margin-top:20px; border-collapse: collapse;">
@@ -91,14 +57,54 @@ function renderTable(income, expense) {
                     <td style="padding:8px;">รายรับ (Income)</td>
                     <td style="text-align:right; padding:8px;" class="text-success">${income.toLocaleString()}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #eee;">
+                <tr>
                     <td style="padding:8px;">รายจ่าย (Expense)</td>
                     <td style="text-align:right; padding:8px;" class="text-danger">${expense.toLocaleString()}</td>
                 </tr>
-                <tr style="background:#f9f9f9; font-weight:bold;">
+                <tr style="background:#f9f9f9; font-weight:bold; border-top: 2px solid #eee;">
                     <td style="padding:8px;">คงเหลือสุทธิ</td>
                     <td style="text-align:right; padding:8px;">${(income - expense).toLocaleString()}</td>
                 </tr>
             </tbody>
         </table>`;
+}
+
+// 4. เมื่อกดปุ่มวิเคราะห์
+if (btnAnalyze) {
+    btnAnalyze.addEventListener("click", async () => {
+        const m = monthInput.value;
+        const token = sessionStorage.getItem("session_token");
+        if (!m) return alert("กรุณาเลือกเดือน");
+        if (!token) {
+            alert("กรุณาเข้าสู่ระบบใหม่");
+            window.location.href = "login.html";
+            return;
+        }
+        try {
+            // ส่งค่าไปหา Code.gs (ส่งทั้ง token และ month)
+            const res = await callApi("analyze", { token, month: m });
+            
+            if (res.success) {
+                const { income, expense } = res.data;
+                
+                // อัปเดตข้อความสรุป
+                analysisText.innerHTML = `
+                    <div style="margin-top:15px;">
+                        <b>ผลสรุปรายเดือน (${m})</b><br>
+                        รายรับ: <span class="text-success">${income.toLocaleString()}</span> บาท<br>
+                        รายจ่าย: <span class="text-danger">${expense.toLocaleString()}</span> บาท<br>
+                        คงเหลือ: <b>${(income - expense).toLocaleString()}</b> บาท
+                    </div>
+                `;
+                
+                renderChart(income, expense);
+                renderTable(income, expense);
+            } else {
+                alert("วิเคราะห์ไม่สำเร็จ: " + res.error);
+            }
+        } catch (e) {
+            console.error(e);
+            alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+        }
+    });
 }
