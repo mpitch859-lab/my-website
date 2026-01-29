@@ -111,5 +111,13 @@ if (btnAnalyze) {
             console.error(e);
             alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
         }
+        const res = await callApi("analyze", { month: m });
+        if (res.success) {
+        const { income, expense } = res.data;
+        // แสดงกราฟ (ใช้ Chart.js เหมือนเดิม เพราะปรับแต่งสวยกว่ากราฟจากชีทโดยตรง)
+        renderChart(income, expense);
+        // แสดงตารางสรุป
+        renderTable(income, expense);
+    }
     });
 }
