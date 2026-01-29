@@ -71,9 +71,14 @@ function renderTable(income, expense) {
 
 // 4. เมื่อกดปุ่มวิเคราะห์
 if (btnAnalyze) {
+    console.log("ปุ่มวิเคราะห์พร้อมทำงาน"); // เพิ่มบรรทัดนี้
     btnAnalyze.addEventListener("click", async () => {
+        console.log("มีการคลิกปุ่มวิเคราะห์แล้ว!"); // เพิ่มบรรทัดนี้
+        
         const m = monthInput.value;
         const token = sessionStorage.getItem("session_token");
+        
+        console.log("ค่าที่อ่านได้:", { month: m, token: token }); // เพิ่มบรรทัดนี้
         if (!m) return alert("กรุณาเลือกเดือน");
         if (!token) {
             alert("กรุณาเข้าสู่ระบบใหม่");
