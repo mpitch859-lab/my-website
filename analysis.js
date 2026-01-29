@@ -1,4 +1,4 @@
-//api-client.js
+// analysis.js
 import { callApi } from "./api-client.js";
 
 const btnAnalyze = document.getElementById("btnAnalyze");
@@ -8,17 +8,15 @@ const analysisTable = document.getElementById("analysisTable");
 const chartEl = document.getElementById("chart");
 let chartInstance = null;
 
-// 1. ตั้งค่าเดือนปัจจุบันใน Input (เช่น 2026-01)
+// 1. ตั้งค่าเดือนปัจจุบัน
 const now = new Date();
 if (monthInput) {
     monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 }
 
-// 2. ฟังก์ชันวาดกราฟวงกลม
+// 2. ฟังก์ชันวาดกราฟ
 function renderChart(income, expense) {
     if (chartInstance) chartInstance.destroy();
-    
-    // ถ้าไม่มีข้อมูลเลย ให้แจ้งเตือนและไม่วาดกราฟ
     if (income === 0 && expense === 0) {
         analysisText.innerHTML += "<br><small style='color:red'>(ไม่พบข้อมูลในเดือนที่เลือก)</small>";
         return;
@@ -32,91 +30,52 @@ function renderChart(income, expense) {
                 backgroundColor: ['#28a745', '#dc3545']
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom' }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false }
     });
 }
 
-// 3. ฟังก์ชันสร้างตารางสรุป
+// 3. ฟังก์ชันสร้างตาราง
 function renderTable(income, expense) {
     analysisTable.innerHTML = `
         <table class="table" style="width:100%; margin-top:20px; border-collapse: collapse;">
-            <thead>
-                <tr style="border-bottom: 2px solid #ddd;">
-                    <th style="text-align:left; padding:8px;">ประเภท</th>
-                    <th style="text-align:right; padding:8px;">จำนวนเงิน</th>
-                </tr>
-            </thead>
+            <thead><tr style="border-bottom: 2px solid #ddd;"><th style="text-align:left;">ประเภท</th><th style="text-align:right;">จำนวนเงิน</th></tr></thead>
             <tbody>
-                <tr>
-                    <td style="padding:8px;">รายรับ (Income)</td>
-                    <td style="text-align:right; padding:8px;" class="text-success">${income.toLocaleString()}</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px;">รายจ่าย (Expense)</td>
-                    <td style="text-align:right; padding:8px;" class="text-danger">${expense.toLocaleString()}</td>
-                </tr>
-                <tr style="background:#f9f9f9; font-weight:bold; border-top: 2px solid #eee;">
-                    <td style="padding:8px;">คงเหลือสุทธิ</td>
-                    <td style="text-align:right; padding:8px;">${(income - expense).toLocaleString()}</td>
-                </tr>
+                <tr><td>รายรับ</td><td style="text-align:right;" class="text-success">${income.toLocaleString()}</td></tr>
+                <tr><td>รายจ่าย</td><td style="text-align:right;" class="text-danger">${expense.toLocaleString()}</td></tr>
+                <tr style="background:#f9f9f9; font-weight:bold;"><td>คงเหลือสุทธิ</td><td style="text-align:right;">${(income - expense).toLocaleString()}</td></tr>
             </tbody>
         </table>`;
 }
 
 // 4. เมื่อกดปุ่มวิเคราะห์
 if (btnAnalyze) {
-    console.log("ปุ่มวิเคราะห์พร้อมทำงาน"); // เพิ่มบรรทัดนี้
+    console.log("ปุ่มวิเคราะห์พร้อมทำงาน");
     btnAnalyze.addEventListener("click", async () => {
-    alert("ปุ่มทำงานแล้ว!"); // เพิ่มบรรทัดนี้เพื่อทดสอบ
-    const m = monthInput.value;
-    const token = sessionStorage.getItem("session_token");
-        
-        console.log("ค่าที่อ่านได้:", { month: m, token: token }); // เพิ่มบรรทัดนี้
+        const m = monthInput.value;
+        const token = sessionStorage.getItem("session_token");
+
         if (!m) return alert("กรุณาเลือกเดือน");
-        if (!token) {
-            alert("กรุณาเข้าสู่ระบบใหม่");
-            window.location.href = "login.html";
-            return;
-        }
+        if (!token) return (window.location.href = "login.html");
+
         try {
-            // ส่งค่าไปหา Code.gs (ส่งทั้ง token และ month)
-            const res = await callApi("analyze", { token, month: m });
+            console.log("ส่งคำขอวิเคราะห์ไปที่ Google Sheets...");
+            // ส่งค่าไปหา Code.gs (ตัวแปร 'd' ใน Code.gs จะได้รับค่า 'month')
+            const res = await callApi("analyze", { month: m });
             
-            if (res.success) {
+            console.log("ผลลัพธ์จาก Server:", res);
+
+            if (res && res.success) {
                 const { income, expense } = res.data;
                 
-                // อัปเดตข้อความสรุป
-                analysisText.innerHTML = `
-                    <div style="margin-top:15px;">
-                        <b>ผลสรุปรายเดือน (${m})</b><br>
-                        รายรับ: <span class="text-success">${income.toLocaleString()}</span> บาท<br>
-                        รายจ่าย: <span class="text-danger">${expense.toLocaleString()}</span> บาท<br>
-                        คงเหลือ: <b>${(income - expense).toLocaleString()}</b> บาท
-                    </div>
-                `;
-                
+                analysisText.innerHTML = `<b>ผลสรุปรายเดือน (${m})</b>`;
                 renderChart(income, expense);
                 renderTable(income, expense);
             } else {
-                alert("วิเคราะห์ไม่สำเร็จ: " + res.error);
+                alert("วิเคราะห์ไม่สำเร็จ: " + (res.error || "Unknown Error"));
             }
         } catch (e) {
-            console.error(e);
-            alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+            console.error("API Call Failed:", e);
+            alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ ตรวจสอบ URL ใน config.js");
         }
-        const res = await callApi("analyze", { month: m });
-        if (res.success) {
-        const { income, expense } = res.data;
-        // แสดงกราฟ (ใช้ Chart.js เหมือนเดิม เพราะปรับแต่งสวยกว่ากราฟจากชีทโดยตรง)
-        renderChart(income, expense);
-        // แสดงตารางสรุป
-        renderTable(income, expense);
-    }
     });
 }
