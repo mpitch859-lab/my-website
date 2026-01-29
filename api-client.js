@@ -1,6 +1,5 @@
 import { GAS_URL } from "./config.js";
-console.log("กำลังส่งข้อมูลไปที่:", GAS_URL); // เพิ่มบรรทัดนี้
-const response = await fetch(GAS_URL, {  });
+console.log("กำลังส่งข้อมูลไปที่:", GAS_URL);
 
 // สำคัญมาก: ต้องมีคำว่า export เพื่อให้ไฟล์อื่นดึงไปใช้ได้
 export async function callApi(action, data = {}) {
