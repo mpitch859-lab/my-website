@@ -11,37 +11,29 @@ if (btnAnalyze) {
     if (!m) return alert("กรุณาเลือกเดือน");
 
     try {
-        analysisTable.innerHTML = "กำลังคำนวณยอด...";
+    analysisTable.innerHTML = "กำลังคำนวณข้อมูล...";
+    const res = await callApi("analyze", { month: m });
 
-        const res = await callApi("analyze", { month: m });
-
-        if (res.success) {
+    if (res.success) {
         const { income, expense, balance } = res.data;
 
-        // แสดงเฉพาะข้อมูลตัวเลขรายรับ รายจ่าย และยอดคงเหลือ
+      // ปรับ UI ให้แสดงผลตามรูปที่คุณต้องการ (ไม่มีกราฟ)
         analysisTable.innerHTML = `
-            <div style="margin-top: 20px; padding: 20px; border-radius: 10px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
-            <h4 style="margin-bottom: 15px; text-align: center;">สรุปยอดเดือน ${m}</h4>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <span>รายรับรวม:</span>
-                <span style="color: green; font-weight: bold;">+ ฿${income.toLocaleString()}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <span>รายจ่ายรวม:</span>
-                <span style="color: red; font-weight: bold;">- ฿${expense.toLocaleString()}</span>
-            </div>
-            <hr style="border-top: 2px solid #ddd;">
-            <div style="display: flex; justify-content: space-between; font-size: 1.2em; font-weight: bold;">
-                <span>ยอดคงเหลือสุทธิ:</span>
-                <span style="color: ${balance >= 0 ? '#28a745' : '#dc3545'};">
-                ฿${balance.toLocaleString()}
-                </span>
-            </div>
-            </div>
+        <div style="background:#fff; padding:20px; border-radius:8px; border:1px solid #ddd;">
+            <h4 style="margin-top:0;">ประเภท จำนวน</h4>
+            <p>รายรับ: <span style="color:green;">${income.toLocaleString()}</span></p>
+            <p>รายจ่าย: <span style="color:red;">${expense.toLocaleString()}</span></p>
+            <hr>
+            <h4>ผลสรุปรายเดือน</h4>
+            <p>รายรับ: ${income.toLocaleString()} บาท</p>
+            <p>รายจ่าย: ${expense.toLocaleString()} บาท</p>
+            <p>คงเหลือ: <b>${balance.toLocaleString()}</b> บาท</p>
+            ${income === 0 && expense === 0 ? '<p style="color:red;">(ไม่มีข้อมูลสำหรับช่วงเวลานี้)</p>' : ''}
+        </div>
         `;
-        }
-    } catch (e) {
-        alert("เกิดข้อผิดพลาดในการดึงข้อมูล");
     }
-    };
+    } catch (e) {
+    alert("เกิดข้อผิดพลาด: " + e.message);
+    }
+};
 }
