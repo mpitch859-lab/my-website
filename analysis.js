@@ -6,34 +6,35 @@ const monthInput = document.getElementById("monthSelect");
 const analysisTable = document.getElementById("analysisTable");
 
 if (btnAnalyze) {
-    btnAnalyze.onclick = async () => {
-    const m = monthInput.value;
+    // ฟังก์ชันเมื่อกดปุ่มวิเคราะห์
+btnAnalyze.onclick = async () => {
+  const m = monthInput.value; // รับค่าจากช่องเลือกเดือน
     if (!m) return alert("กรุณาเลือกเดือน");
 
     try {
-    analysisTable.innerHTML = "กำลังคำนวณข้อมูล...";
+    // เรียก API (ผ่านระบบ api-client ที่คุณมี)
     const res = await callApi("analyze", { month: m });
 
     if (res.success) {
         const { income, expense, balance } = res.data;
 
-      // ปรับ UI ให้แสดงผลตามรูปที่คุณต้องการ (ไม่มีกราฟ)
-        analysisTable.innerHTML = `
-        <div style="background:#fff; padding:20px; border-radius:8px; border:1px solid #ddd;">
-            <h4 style="margin-top:0;">ประเภท จำนวน</h4>
+      // นำข้อมูลไปโชว์ใน div ที่เตรียมไว้ (อ้างอิงรูปแบบจากภาพของคุณ)
+        document.getElementById("analysisTable").innerHTML = `
+        <div class="result-card">
+            <h3>ประเภท จำนวน</h3>
             <p>รายรับ: <span style="color:green;">${income.toLocaleString()}</span></p>
             <p>รายจ่าย: <span style="color:red;">${expense.toLocaleString()}</span></p>
             <hr>
-            <h4>ผลสรุปรายเดือน</h4>
+            <h3>ผลสรุปรายเดือน</h3>
             <p>รายรับ: ${income.toLocaleString()} บาท</p>
             <p>รายจ่าย: ${expense.toLocaleString()} บาท</p>
             <p>คงเหลือ: <b>${balance.toLocaleString()}</b> บาท</p>
-            ${income === 0 && expense === 0 ? '<p style="color:red;">(ไม่มีข้อมูลสำหรับช่วงเวลานี้)</p>' : ''}
         </div>
         `;
     }
     } catch (e) {
-    alert("เกิดข้อผิดพลาด: " + e.message);
+    console.error("Error:", e);
+    alert("ดึงข้อมูลไม่สำเร็จ");
     }
 };
 }
