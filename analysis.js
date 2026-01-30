@@ -15,6 +15,7 @@ async function autoRefreshAnalysis() {
         token,
         month: m
     });
+    console.log("Analyze response:", res);
     if (!res.success) {
         console.error("Analyze error:", res.error, res.stack);
         analysisTable.innerHTML =
