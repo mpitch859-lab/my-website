@@ -1,2 +1,2 @@
 // js/config.js
-export const GAS_URL ="https://script.google.com/macros/s/AKfycbxFMKfkYYqHWXulb1DHHQ7Z9KAi3E31822K3G0PqKeINiwczhkWhC8nQ8cwi6u6-d4x/exec";
+export const GAS_URL ="https://script.google.com/macros/s/AKfycbxgCg6B-Fa-c1373EeuqGplB8akseqSM2JhG1HGKXQAHm-0LqVT7i9w9jXXT1bymXyD/exec";
