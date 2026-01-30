@@ -9,7 +9,9 @@ let chartInstance = null; // สร้างตัวแปรไว้เก็
 if (btnAnalyze) {
     btnAnalyze.onclick = async () => {
     // 1. ตรวจสอบความพร้อม
+    console.log("ปุ่มถูกกดแล้ว!"); // เพิ่มบรรทัดนี้
     const m = monthInput.value;
+    console.log("เดือนที่เลือกคือ:", m);
     if (!m) return alert("กรุณาเลือกเดือน");
     try {
       // 2. เรียกข้อมูลจาก Google Sheets
