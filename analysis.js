@@ -1,84 +1,48 @@
-// analysis.js
 import { callApi } from "./api-client.js";
 
 const btnAnalyze = document.getElementById("btnAnalyze");
 const monthInput = document.getElementById("monthSelect");
-const analysisText = document.getElementById("analysisText");
-const analysisTable = document.getElementById("analysisTable");
+const resultDiv = document.getElementById("analysisTable"); // หรือจุดที่คุณจะโชว์ตัวเลข
 const chartEl = document.getElementById("chart");
-let chartInstance = null;
+let chartInstance = null; // สร้างตัวแปรไว้เก็บสถานะกราฟ
 
-// 1. ตั้งค่าเดือนปัจจุบัน
-const now = new Date();
-if (monthInput) {
-    monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-}
-
-// 2. ฟังก์ชันวาดกราฟ
-function renderChart(income, expense) {
-    if (chartInstance) chartInstance.destroy();
-    if (income === 0 && expense === 0) {
-        analysisText.innerHTML += "<br><small style='color:red'>(ไม่พบข้อมูลในเดือนที่เลือก)</small>";
-        return;
-    }
-    chartInstance = new Chart(chartEl.getContext('2d'), {
-        type: 'doughnut',
-        data: {
+if (btnAnalyze) {
+    btnAnalyze.onclick = async () => {
+    // 1. ตรวจสอบความพร้อม
+    const m = monthInput.value;
+    if (!m) return alert("กรุณาเลือกเดือน");
+    try {
+      // 2. เรียกข้อมูลจาก Google Sheets
+        const res = await callApi("analyze", { month: m });
+        if (res.success) {
+        const { income, expense, balance } = res.data;
+        // 3. แสดงผลตัวเลข (สรุปยอด)
+        resultDiv.innerHTML = `
+            <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
+            <p style="color:#28a745">รายรับ: ฿${income.toLocaleString()}</p>
+            <p style="color:#dc3545">รายจ่าย: ฿${expense.toLocaleString()}</p>
+            <hr>
+            <p><b>ยอดคงเหลือ: ฿${balance.toLocaleString()}</b></p>
+            /div>
+        `;
+        // 4. วาดกราฟ (และลบตัวเก่าทิ้งก่อนเพื่อป้องกันกราฟค้าง)
+        if (chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(chartEl.getContext('2d'), {
+            type: 'doughnut',
+            data: {
             labels: ['รายรับ', 'รายจ่าย'],
             datasets: [{
                 data: [income, expense],
                 backgroundColor: ['#28a745', '#dc3545']
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
-}
-
-// 3. ฟังก์ชันสร้างตาราง
-function renderTable(income, expense) {
-    analysisTable.innerHTML = `
-        <table class="table" style="width:100%; margin-top:20px; border-collapse: collapse;">
-            <thead><tr style="border-bottom: 2px solid #ddd;"><th style="text-align:left;">ประเภท</th><th style="text-align:right;">จำนวนเงิน</th></tr></thead>
-            <tbody>
-                <tr><td>รายรับ</td><td style="text-align:right;" class="text-success">${income.toLocaleString()}</td></tr>
-                <tr><td>รายจ่าย</td><td style="text-align:right;" class="text-danger">${expense.toLocaleString()}</td></tr>
-                <tr style="background:#f9f9f9; font-weight:bold;"><td>คงเหลือสุทธิ</td><td style="text-align:right;">${(income - expense).toLocaleString()}</td></tr>
-            </tbody>
-        </table>`;
-}
-
-// แก้ไขในส่วน btnAnalyze.addEventListener
-if (btnAnalyze) {
-    btnAnalyze.addEventListener("click", async () => {
-        const m = monthInput.value;
-        const token = sessionStorage.getItem("session_token");
-        if (!m) return alert("กรุณาเลือกเดือน");
-        if (!token) return (window.location.href = "login.html");
-        // --- จุดที่เพิ่ม: เคลียร์ UI เก่า ---
-        analysisText.innerHTML = "กำลังวิเคราะห์ข้อมูล...";
-        analysisTable.innerHTML = "";
-        if (chartInstance) {
-            chartInstance.destroy();
-            chartInstance = null;
-        }
-        // -----------------------------
-        try {
-            const res = await callApi("analyze", { month: m });
-            
-            if (res && res.success) {
-                const { income, expense } = res.data;
-                
-                analysisText.innerHTML = `<b>ผลสรุปรายเดือน (${m})</b>`;
-                renderChart(income, expense);
-                renderTable(income, expense);
-            } else {
-                analysisText.innerHTML = "";
-                alert("วิเคราะห์ไม่สำเร็จ: " + (res.error || "Unknown Error"));
-            }
-        } catch (e) {
-            analysisText.innerHTML = "";
-            console.error("API Call Failed:", e);
-            alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
-        }
-    });
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    } else {
+        alert("ผิดพลาด: " + res.error);
+    }
+    } catch (e) {
+        alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+    }
+};
 }
