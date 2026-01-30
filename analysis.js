@@ -3,51 +3,45 @@ import { callApi } from "./api-client.js";
 // ดึงตัวแปรจากหน้า HTML
 const btnAnalyze = document.getElementById("btnAnalyze");
 const monthInput = document.getElementById("monthSelect");
-const analysisTable = document.getElementById("analysisTable"); // พื้นที่โชว์ตัวเลข
-const chartEl = document.getElementById("chart");
-let chartInstance = null;
+const analysisTable = document.getElementById("analysisTable");
 
 if (btnAnalyze) {
     btnAnalyze.onclick = async () => {
-    const m = monthInput.value; // ค่า YYYY-MM จากช่อง input
+    const m = monthInput.value;
     if (!m) return alert("กรุณาเลือกเดือน");
+
     try {
-      // แสดงสถานะกำลังคำนวณ
-        analysisTable.innerHTML = "กำลังคำนวณยอดจากรายการทั้งหมด...";
-      // เรียก API ไปที่ Code.gs
+        analysisTable.innerHTML = "กำลังคำนวณยอด...";
+
         const res = await callApi("analyze", { month: m });
+
         if (res.success) {
         const { income, expense, balance } = res.data;
-        // 1. แสดงผลตัวเลขสรุป
+
+        // แสดงเฉพาะข้อมูลตัวเลขรายรับ รายจ่าย และยอดคงเหลือ
         analysisTable.innerHTML = `
-            <div style="padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
-            <p style="color: green; font-size: 1.2em;">รายรับรวม: <b>฿${income.toLocaleString()}</b></p>
-            <p style="color: red; font-size: 1.2em;">รายจ่ายรวม: <b>฿${expense.toLocaleString()}</b></p>
-            <hr>
-            <h3 style="margin: 10px 0;">ยอดคงเหลือ: ฿${balance.toLocaleString()}</h3>
+            <div style="margin-top: 20px; padding: 20px; border-radius: 10px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
+            <h4 style="margin-bottom: 15px; text-align: center;">สรุปยอดเดือน ${m}</h4>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>รายรับรวม:</span>
+                <span style="color: green; font-weight: bold;">+ ฿${income.toLocaleString()}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>รายจ่ายรวม:</span>
+                <span style="color: red; font-weight: bold;">- ฿${expense.toLocaleString()}</span>
+            </div>
+            <hr style="border-top: 2px solid #ddd;">
+            <div style="display: flex; justify-content: space-between; font-size: 1.2em; font-weight: bold;">
+                <span>ยอดคงเหลือสุทธิ:</span>
+                <span style="color: ${balance >= 0 ? '#28a745' : '#dc3545'};">
+                ฿${balance.toLocaleString()}
+                </span>
+            </div>
             </div>
         `;
-        // 2. วาดกราฟ Doughnut
-        if (chartInstance) chartInstance.destroy(); // ลบกราฟเก่า
-        if (income > 0 || expense > 0) {
-            chartInstance = new Chart(chartEl.getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: ['รายรับ', 'รายจ่าย'],
-                datasets: [{
-                data: [income, expense],
-                backgroundColor: ['#28a745', '#dc3545'],
-                borderWidth: 1
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-            });
-        } else {
-            analysisTable.innerHTML += "<p style='color: gray;'>* ไม่พบรายการเคลื่อนไหวในเดือนนี้</p>";
-        }
         }
     } catch (e) {
-        alert("เกิดข้อผิดพลาดในการคำนวณ: " + e.message);
+        alert("เกิดข้อผิดพลาดในการดึงข้อมูล");
     }
-};
+    };
 }
