@@ -47,23 +47,24 @@ function renderTable(income, expense) {
         </table>`;
 }
 
-// 4. เมื่อกดปุ่มวิเคราะห์
+// แก้ไขในส่วน btnAnalyze.addEventListener
 if (btnAnalyze) {
-    console.log("ปุ่มวิเคราะห์พร้อมทำงาน");
     btnAnalyze.addEventListener("click", async () => {
         const m = monthInput.value;
         const token = sessionStorage.getItem("session_token");
-
         if (!m) return alert("กรุณาเลือกเดือน");
         if (!token) return (window.location.href = "login.html");
-
+        // --- จุดที่เพิ่ม: เคลียร์ UI เก่า ---
+        analysisText.innerHTML = "กำลังวิเคราะห์ข้อมูล...";
+        analysisTable.innerHTML = "";
+        if (chartInstance) {
+            chartInstance.destroy();
+            chartInstance = null;
+        }
+        // -----------------------------
         try {
-            console.log("ส่งคำขอวิเคราะห์ไปที่ Google Sheets...");
-            // ส่งค่าไปหา Code.gs (ตัวแปร 'd' ใน Code.gs จะได้รับค่า 'month')
             const res = await callApi("analyze", { month: m });
             
-            console.log("ผลลัพธ์จาก Server:", res);
-
             if (res && res.success) {
                 const { income, expense } = res.data;
                 
@@ -71,11 +72,13 @@ if (btnAnalyze) {
                 renderChart(income, expense);
                 renderTable(income, expense);
             } else {
+                analysisText.innerHTML = "";
                 alert("วิเคราะห์ไม่สำเร็จ: " + (res.error || "Unknown Error"));
             }
         } catch (e) {
+            analysisText.innerHTML = "";
             console.error("API Call Failed:", e);
-            alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ ตรวจสอบ URL ใน config.js");
+            alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
         }
     });
 }
