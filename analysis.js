@@ -1,50 +1,53 @@
 import { callApi } from "./api-client.js";
 
+// ดึงตัวแปรจากหน้า HTML
 const btnAnalyze = document.getElementById("btnAnalyze");
 const monthInput = document.getElementById("monthSelect");
-const resultDiv = document.getElementById("analysisTable"); // หรือจุดที่คุณจะโชว์ตัวเลข
+const analysisTable = document.getElementById("analysisTable"); // พื้นที่โชว์ตัวเลข
 const chartEl = document.getElementById("chart");
-let chartInstance = null; // สร้างตัวแปรไว้เก็บสถานะกราฟ
+let chartInstance = null;
 
 if (btnAnalyze) {
     btnAnalyze.onclick = async () => {
-    // 1. ตรวจสอบความพร้อม
-    console.log("ปุ่มถูกกดแล้ว!"); // เพิ่มบรรทัดนี้
-    const m = monthInput.value;
-    console.log("เดือนที่เลือกคือ:", m);
+    const m = monthInput.value; // ค่า YYYY-MM จากช่อง input
     if (!m) return alert("กรุณาเลือกเดือน");
     try {
-      // 2. เรียกข้อมูลจาก Google Sheets
+      // แสดงสถานะกำลังคำนวณ
+        analysisTable.innerHTML = "กำลังคำนวณยอดจากรายการทั้งหมด...";
+      // เรียก API ไปที่ Code.gs
         const res = await callApi("analyze", { month: m });
         if (res.success) {
         const { income, expense, balance } = res.data;
-        // 3. แสดงผลตัวเลข (สรุปยอด)
-        resultDiv.innerHTML = `
-            <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
-            <p style="color:#28a745">รายรับ: ฿${income.toLocaleString()}</p>
-            <p style="color:#dc3545">รายจ่าย: ฿${expense.toLocaleString()}</p>
+        // 1. แสดงผลตัวเลขสรุป
+        analysisTable.innerHTML = `
+            <div style="padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
+            <p style="color: green; font-size: 1.2em;">รายรับรวม: <b>฿${income.toLocaleString()}</b></p>
+            <p style="color: red; font-size: 1.2em;">รายจ่ายรวม: <b>฿${expense.toLocaleString()}</b></p>
             <hr>
-            <p><b>ยอดคงเหลือ: ฿${balance.toLocaleString()}</b></p>
-            /div>
+            <h3 style="margin: 10px 0;">ยอดคงเหลือ: ฿${balance.toLocaleString()}</h3>
+            </div>
         `;
-        // 4. วาดกราฟ (และลบตัวเก่าทิ้งก่อนเพื่อป้องกันกราฟค้าง)
-        if (chartInstance) chartInstance.destroy();
-        chartInstance = new Chart(chartEl.getContext('2d'), {
+        // 2. วาดกราฟ Doughnut
+        if (chartInstance) chartInstance.destroy(); // ลบกราฟเก่า
+        if (income > 0 || expense > 0) {
+            chartInstance = new Chart(chartEl.getContext('2d'), {
             type: 'doughnut',
             data: {
-            labels: ['รายรับ', 'รายจ่าย'],
-            datasets: [{
+                labels: ['รายรับ', 'รายจ่าย'],
+                datasets: [{
                 data: [income, expense],
-                backgroundColor: ['#28a745', '#dc3545']
-            }]
-        },
+                backgroundColor: ['#28a745', '#dc3545'],
+                borderWidth: 1
+                }]
+            },
             options: { responsive: true, maintainAspectRatio: false }
-        });
-    } else {
-        alert("ผิดพลาด: " + res.error);
-    }
+            });
+        } else {
+            analysisTable.innerHTML += "<p style='color: gray;'>* ไม่พบรายการเคลื่อนไหวในเดือนนี้</p>";
+        }
+        }
     } catch (e) {
-        alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+        alert("เกิดข้อผิดพลาดในการคำนวณ: " + e.message);
     }
 };
 }
