@@ -1,3 +1,4 @@
+//analysis.js
 import { callApi } from "./api-client.js";
 
 const monthInput = document.getElementById("monthSelect");
@@ -10,11 +11,7 @@ async function autoRefreshAnalysis() {
         analysisTable.innerHTML = `<div style="text-align:center; padding:20px;">
                                         <p>กำลังดึงข้อมูลเดือน ${m}...</p>
                                     </div>`;
-        const token = localStorage.getItem("token");
-        const res = await callApi("analyze", {
-        token,
-        month: m
-    });
+        const res = await callApi("analyze", { month: m });
     console.log("Analyze response:", res);
     if (!res.success) {
         console.error("Analyze error:", res.error, res.stack);
