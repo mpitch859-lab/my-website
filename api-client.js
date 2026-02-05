@@ -8,10 +8,10 @@ export async function callApi(action, data = {}) {
 
         const response = await fetch(GAS_URL, {
             method: "POST",
-            headers: {
-            "Content-Type": "application/json"
-            },
-            redirect: "follow",
+            
+            mode: 'no-cors',
+            
+            method: "POST",
             body: JSON.stringify(bodyData)
         });
 
