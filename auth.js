@@ -17,7 +17,7 @@ document.getElementById("btnRegister")?.addEventListener("click", async () => {
     alert("สมัครสำเร็จ");
     location.href = "login.html";
   } else {
-    alert(res.error || "สมัครไม่สำเร็จ");
+    alert(res.message || "สมัครไม่สำเร็จ");
   }
 });
 
@@ -34,10 +34,10 @@ document.getElementById("btnLogin")?.addEventListener("click", async () => {
   const res = await callApi("login", { email, password });
 
   if (res.success) {
-    sessionStorage.setItem("session_token", res.data.token);
+    sessionStorage.setItem("session_token", res.token);
     location.href = "record.html";
   } else {
-    alert(res.error || "เข้าสู่ระบบไม่สำเร็จ");
+    alert(res.message || "เข้าสู่ระบบไม่สำเร็จ");
   }
 });
 
