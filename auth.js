@@ -1,36 +1,59 @@
+// auth.js
 import { callApi } from "./api-client.js";
 
-// REGISTER
+/* ---------- REGISTER ---------- */
 document.getElementById("btnRegister")?.addEventListener("click", async () => {
-  const email = regEmail.value;
-  const password = regPassword.value;
+  const email = document.getElementById("regEmail")?.value.trim();
+  const password = document.getElementById("regPassword")?.value;
+
+  if (!email || !password) {
+    alert("กรุณากรอกข้อมูลให้ครบ");
+    return;
+  }
+
   const res = await callApi("register", { email, password });
+
   if (res.success) {
     alert("สมัครสำเร็จ");
     location.href = "login.html";
-  } else alert(res.error);
+  } else {
+    alert(res.error || "สมัครไม่สำเร็จ");
+  }
 });
 
-// LOGIN
+/* ---------- LOGIN ---------- */
 document.getElementById("btnLogin")?.addEventListener("click", async () => {
-  const email = loginEmail.value;
-  const password = loginPassword.value;
+  const email = document.getElementById("loginEmail")?.value.trim();
+  const password = document.getElementById("loginPassword")?.value;
+
+  if (!email || !password) {
+    alert("กรุณากรอกข้อมูลให้ครบ");
+    return;
+  }
+
   const res = await callApi("login", { email, password });
+
   if (res.success) {
     sessionStorage.setItem("session_token", res.data.token);
     location.href = "record.html";
-  } else alert(res.error);
+  } else {
+    alert(res.error || "เข้าสู่ระบบไม่สำเร็จ");
+  }
 });
 
-// LOGOUT
+/* ---------- LOGOUT ---------- */
 document.getElementById("btnLogout")?.addEventListener("click", () => {
   sessionStorage.clear();
   location.href = "login.html";
 });
 
-// PROTECT
-const protectedPages = ["record.html","analysis.html","calendar.html"];
+/* ---------- PROTECT PAGE ---------- */
+const protectedPages = ["record.html", "analysis.html", "calendar.html"];
 const page = location.pathname.split("/").pop();
-if (protectedPages.includes(page) && !sessionStorage.getItem("session_token")) {
+
+if (
+  protectedPages.includes(page) &&
+  !sessionStorage.getItem("session_token")
+) {
   location.href = "login.html";
 }
