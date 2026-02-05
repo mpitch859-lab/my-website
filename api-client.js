@@ -1,24 +1,40 @@
-//api-client.js
+// api-client.js
 import { GAS_URL } from "./config.js";
 
 export async function callApi(action, data = {}) {
     try {
         const token = sessionStorage.getItem("session_token");
         const bodyData = { action, token, ...data };
-        
+
+        // ส่งแบบ text/plain เพื่อเลี่ยง CORS Preflight (OPTIONS) 100%
+        // แต่ฝั่ง GAS จะใช้ JSON.parse อ่านข้อมูลได้ปกติ
         const response = await fetch(GAS_URL, {
             method: "POST",
-            mode: "no-cors", // ใช้ no-cors เพื่อข้ามกำแพง CORS 100%
-            body: JSON.stringify(bodyData) // ส่ง JSON ไปตรงๆ แต่ไม่ตั้ง Content-Type
+            mode: "cors",
+            body: JSON.stringify(bodyData)
         });
-    
-        // เนื่องจากใช้ no-cors เราจะไม่สามารถอ่านผลลัพธ์ JSON ได้โดยตรง (Security ของ Browser)
-        // แต่ข้อมูลจะไปบันทึกใน Google Sheet แน่นอน
-        // วิธีแก้ที่ดีที่สุดสำหรับ Login/Register คือ "สมมติว่าสำเร็จ" หรือใช้ doGet สำหรับตรวจสอบ
-        return { success: true };
-    
-        } catch (error) {
-            console.error("API Error:", error);
-            throw error;
+
+        // ตรวจสอบว่ามีข้อมูลตอบกลับมาไหม
+        const resultText = await response.text();
+        if (!resultText) throw new Error("ไม่มีการตอบกลับจากเซิร์ฟเวอร์");
+        
+        const result = JSON.parse(resultText);
+
+        // จัดการกรณี Session หมดอายุ
+        if (!result.success && result.error?.includes("Session expired")) {
+            if (!window.location.pathname.includes("login.html")) {
+                alert("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
+                sessionStorage.clear();
+                window.location.href = "login.html";
+            }
+            return result;
+        }
+
+        if (!result.success) throw new Error(result.error);
+        return result;
+
+    } catch (error) {
+        console.error("API Error:", error);
+        throw error;
     }
 }
