@@ -7,8 +7,9 @@ export async function callApi(action, data = {}) {
 
     const res = await fetch(GAS_URL, {
       method: "POST",
+      mode: "cors", // ต้องใส่ cors เพื่อให้ Browser ยอมรับ JSON
       headers: {
-        "Content-Type": "text/plain"
+        "Content-Type": "text/plain" // ใช้ text/plain เพื่อเลี่ยง Preflight ของ GAS
       },
       body: JSON.stringify({
         action,
@@ -18,10 +19,10 @@ export async function callApi(action, data = {}) {
     });
 
     const result = await res.json();
-    return result;
+    return result; // ส่งผลลัพธ์กลับไป (จะมี success และ data/error)
 
   } catch (err) {
     console.error("API ERROR:", err);
-    return { success: false, error: "สมัครไม่สำเร็จ: ตรวจสอบการตั้งค่า Anyone ใน GAS" };
+    return { success: false, error: "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้" };
   }
 }
