@@ -7,12 +7,14 @@ export async function callApi(action, data = {}) {
 
     const res = await fetch(GAS_URL, {
       method: "POST",
+      mode: "cors", // เพิ่มตรงนี้เพื่อให้มั่นใจ
       headers: {
-        "Content-Type": "application/json"
+        // ใช้ text/plain เพื่อข้ามปัญหา CORS ในบาง Browser
+        "Content-Type": "text/plain;charset=utf-8"
       },
       body: JSON.stringify({
         action,
-        token,       // ✅ ส่ง token ไปทุก request
+        token,
         ...data
       })
     });
