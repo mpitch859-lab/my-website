@@ -8,29 +8,20 @@ export async function callApi(action, data = {}) {
 
         const response = await fetch(GAS_URL, {
             method: "POST",
-            
-            mode: 'no-cors',
-            
-            method: "POST",
-            body: JSON.stringify(bodyData)
+            mode: "cors",
+            body: JSON.stringify(bodyData),
         });
 
-        const result = await response.json();
-
-        if (!result.success && result.error?.includes("Session expired")) {
-            if (!window.location.pathname.includes("login.html")) {
-                alert("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่");
-                sessionStorage.clear();
-                window.location.href = "login.html";
-            }
-            return;
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        if (!result.success) throw new Error(result.error);
-        return result;
-
+        const text = await response.text();
+        if (!text) throw new Error("Empty response from server");
+        
+        return JSON.parse(text);
     } catch (error) {
-        console.error("API Error:", error);
+        console.error("API Error Detail:", error);
         throw error;
     }
 }
