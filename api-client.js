@@ -1,15 +1,12 @@
 // api-client.js
-import { GAS_URL } from "./config.js";
-
 export async function callApi(action, data = {}) {
   try {
     const token = sessionStorage.getItem("session_token");
 
     const res = await fetch(GAS_URL, {
       method: "POST",
-      mode: "cors", // เพิ่มตรงนี้เพื่อให้มั่นใจ
+      // ห้ามใส่โหมด no-cors เพราะเราต้องการอ่าน JSON กลับมา
       headers: {
-        // ใช้ text/plain เพื่อข้ามปัญหา CORS ในบาง Browser
         "Content-Type": "text/plain;charset=utf-8"
       },
       body: JSON.stringify({
@@ -19,16 +16,10 @@ export async function callApi(action, data = {}) {
       })
     });
 
-    if (!res.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    return await res.json();
+    const result = await res.json();
+    return result;
   } catch (err) {
     console.error("API ERROR:", err);
-    return {
-      success: false,
-      message: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้"
-    };
+    return { success: false, error: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้" };
   }
 }

@@ -32,16 +32,30 @@ document.getElementById("btnLogin")?.addEventListener("click", async () => {
     alert("กรุณากรอกข้อมูลให้ครบ");
     return;
   }
-
-  const res = await callApi("login", { email, password });
-
-  if (res.success && res.data) {
-    // ⚠️ ต้องดึงจาก res.data.token ตามที่ GAS ส่งมา
-    sessionStorage.setItem("session_token", res.data.token);
-    location.href = "record.html";
-  } else {
-    alert(res.error || "อีเมลหรือรหัสผ่านไม่ถูกต้อง");
-  }
+// auth.js (ส่วน Login)
+const res = await callApi("login", { email, password });
+if (res.success && res.data) {
+  // ต้องดึงจาก res.data.token
+  sessionStorage.setItem("session_token", res.data.token);
+  location.href = "record.html";
+} else {
+  alert(res.error || "อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+}
 });
 
-// ... ส่วนที่เหลือ (Logout / Protect Page) ใช้ของเดิมได้เลยครับ ...
+/* ---------- LOGOUT ---------- */
+document.getElementById("btnLogout")?.addEventListener("click", () => {
+  sessionStorage.clear();
+  location.href = "login.html";
+});
+
+/* ---------- PROTECT PAGE ---------- */
+const protectedPages = ["record.html", "analysis.html", "calendar.html"];
+const page = location.pathname.split("/").pop();
+
+if (
+  protectedPages.includes(page) &&
+  !sessionStorage.getItem("session_token")
+) {
+  location.href = "login.html";
+}
