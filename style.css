@@ -39,6 +39,6 @@ input, select{width:100%;padding:10px;border:1px solid #e6eefb;border-radius:10p
 .btn-outline1{background:transparent;border:2px solid var(--accent);color:var(--accent);font-weight:500;}
 #calendar{max-width:900px}
 @media(max-width:800px){.cols{flex-direction:column}.form-grid{grid-template-columns:1fr}}
-.equili-popup { border-radius: 20px !important; font-family: 'Kanit', sans-serif !important;}
-.equili-button { border-radius: 10px !important; padding: 10px 30px !important; background-color: #007bff !important;}
 .btn-equili { background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 10px; cursor: pointer;}
+.equili-popup { border-radius: 20px !important; font-family: 'Kanit', sans-serif !important;}
+.equili-button { border-radius: 10px !important; padding: 10px 30px !important;}

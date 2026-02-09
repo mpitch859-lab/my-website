@@ -1,5 +1,5 @@
 // auth.js
-import { callApi } from "./api-client.js";
+import { callApi, showNotify } from "./api-client.js";
 
 /* ---------- REGISTER ---------- */
 document.getElementById("btnRegister")?.addEventListener("click", async () => {
@@ -7,17 +7,17 @@ document.getElementById("btnRegister")?.addEventListener("click", async () => {
   const password = document.getElementById("regPassword")?.value;
 
   if (!email || !password) {
-    alert("กรุณากรอกข้อมูลให้ครบ");
+    showNotify('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบ', 'warning');
     return;
   }
 
   const res = await callApi("register", { email, password });
 
   if (res.success) {
-    alert("สมัครสำเร็จ");
+    showNotify('สำเร็จ', 'สมัครสำเร็จ', 'success');
     location.href = "login.html";
   } else {
-    alert(res.error || "สมัครไม่สำเร็จ");
+    showNotify('ผิดพลาด', res.error || "สมัครไม่สำเร็จ", 'error');
   }
 });
 
@@ -27,7 +27,7 @@ document.getElementById("btnLogin")?.addEventListener("click", async () => {
   const password = document.getElementById("loginPassword")?.value;
 
   if (!email || !password) {
-    alert("กรุณากรอกข้อมูลให้ครบ");
+    showNotify('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบ', 'warning');
     return;
   }
 const res = await callApi("login", { email, password });
@@ -35,7 +35,7 @@ if (res.success && res.data) {
   sessionStorage.setItem("session_token", res.data.token);
   location.href = "record.html";
 } else {
-  alert(res.error || "อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+  showNotify('ผิดพลาด', res.error || "อีเมลหรือรหัสผ่านไม่ถูกต้อง", 'error');
 }
 });
 

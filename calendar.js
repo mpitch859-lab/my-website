@@ -1,5 +1,5 @@
 // js/calendar.js
-import { callApi } from "./api-client.js";
+import { callApi, showNotify } from "./api-client.js";
 async function initCalendar() {
 try {
     const res = await callApi("list", {});
@@ -15,7 +15,7 @@ try {
     initialView: 'dayGridMonth',
     events,
     eventClick: function(info) {
-        alert(`${info.event.title}\nวันที่: ${info.event.start.toISOString().slice(0,10)}`);
+        showNotify(info.event.title, `วันที่: ${info.event.start.toISOString().slice(0,10)}`, 'info');
     }
     });
     calendar.render();

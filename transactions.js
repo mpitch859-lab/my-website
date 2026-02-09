@@ -1,5 +1,5 @@
 // js/transactions.js
-import { callApi } from "./api-client.js";
+import { callApi, showNotify } from "./api-client.js";
 
 const btnSave = document.getElementById("btnSave");
 const listDiv = document.getElementById("list");
@@ -11,9 +11,9 @@ btnSave.addEventListener("click", async () => {
     const amount = parseFloat(document.getElementById("amount").value);
     const date = document.getElementById("date").value;
     const note = document.getElementById("note").value || "";
-    if (!amount || !date) return alert("กรุณากรอกจำนวนเงินและวันที่");
+    if (!amount || !date) return showNotify('แจ้งเตือน', 'กรุณากรอกข้อมูล', 'warning');
     const resp = await callApi("add", { type, category, amount, date, note });
-    alert("บันทึกเรียบร้อย");
+    showNotify('บันทึกสำเร็จ', 'บันทึกเรียบร้อย');
     loadTransactions();
     } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
 });
@@ -45,22 +45,32 @@ try {
         const newNote = prompt("หมายเหตุใหม่:", "");
         if (!newAmount) return;
         await callApi("update", { id, amount: parseFloat(newAmount), note: newNote });
-        alert("แก้ไขเรียบร้อย");
+        showNotify('สำเร็จ', 'แก้ไขเรียบร้อย');
         loadTransactions();
     });
     });
     document.querySelectorAll(".del").forEach(btn => {
     btn.addEventListener("click", async (e) => {
         const id = e.target.dataset.id;
-        if (!confirm("ต้องการลบรายการนี้หรือไม่?")) return;
-        await callApi("delete", { id });
-        alert("ลบเรียบร้อย");
-        loadTransactions();
+        Swal.fire({
+            title: 'ต้องการลบรายการนี้?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'ลบ',
+            cancelButtonText: 'ยกเลิก',
+            customClass: { popup: 'equili-popup' }
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                await callApi("delete", { id });
+                showNotify('สำเร็จ', 'ลบเรียบร้อย');
+                loadTransactions();
+            }
+        });;
     });
     });
 } catch (e) { console.error(e); if (e.message) alert(e.message); }
 }
-// load on page ready
+
 if (window.location.pathname.split("/").pop() === "record.html") {
 window.addEventListener("DOMContentLoaded", loadTransactions);
 }

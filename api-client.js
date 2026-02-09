@@ -7,9 +7,9 @@ export async function callApi(action, data = {}) {
 
     const res = await fetch(GAS_URL, {
       method: "POST",
-      mode: "cors", // ต้องใส่ cors เพื่อให้ Browser ยอมรับ JSON
+      mode: "cors",
       headers: {
-        "Content-Type": "text/plain" // ใช้ text/plain เพื่อเลี่ยง Preflight ของ GAS
+        "Content-Type": "text/plain"
       },
       body: JSON.stringify({
         action,
@@ -19,10 +19,23 @@ export async function callApi(action, data = {}) {
     });
 
     const result = await res.json();
-    return result; // ส่งผลลัพธ์กลับไป (จะมี success และ data/error)
+    return result;
 
   } catch (err) {
     console.error("API ERROR:", err);
     return { success: false, error: "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้" };
   }
+}
+export function showNotify(title, text, type = 'success') {
+    Swal.fire({
+        title: title,
+        text: text,
+        icon: type,
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#0b84ff',
+        customClass: {
+            popup: 'equili-popup',
+            confirmButton: 'equili-button'
+        }
+    });
 }
