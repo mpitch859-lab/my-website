@@ -10,16 +10,6 @@ let chartInstance = null;
 let currentType = 'bar';
 let globalData = { income: 0, expense: 0, categories: {} };
 
-function showNotify(title, text, type = 'success') {
-    Swal.fire({
-        title: title,
-        text: text,
-        icon: type,
-        confirmButtonText: 'ตกลง',
-        customClass: { popup: 'equili-popup', confirmButton: 'equili-button' }
-    });
-}
-
 function renderChart(type) {
     const ctx = document.getElementById('myChart').getContext('2d');
     if (chartInstance) chartInstance.destroy();
