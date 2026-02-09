@@ -33,9 +33,6 @@ export function showNotify(title, text, type = 'success') {
         icon: type,
         confirmButtonText: 'ตกลง',
         confirmButtonColor: '#0b84ff',
-        customClass: {
-            popup: 'equili-popup',
-            confirmButton: 'equili-button'
-        }
+        customClass: { popup: 'equili-popup', confirmButton: 'equili-button' }
     });
 }
