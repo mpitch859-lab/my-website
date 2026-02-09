@@ -13,12 +13,10 @@ document.getElementById("btnRegister")?.addEventListener("click", async () => {
 
   const res = await callApi("register", { email, password });
 
-  // เช็ค res.success จาก GAS
   if (res.success) {
     alert("สมัครสำเร็จ");
     location.href = "login.html";
   } else {
-    // แสดง error message จาก err.message ใน GAS
     alert(res.error || "สมัครไม่สำเร็จ");
   }
 });
@@ -32,10 +30,8 @@ document.getElementById("btnLogin")?.addEventListener("click", async () => {
     alert("กรุณากรอกข้อมูลให้ครบ");
     return;
   }
-// auth.js (ส่วน Login)
 const res = await callApi("login", { email, password });
 if (res.success && res.data) {
-  // ต้องดึงจาก res.data.token
   sessionStorage.setItem("session_token", res.data.token);
   location.href = "record.html";
 } else {
