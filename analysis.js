@@ -77,17 +77,33 @@ async function autoRefreshAnalysis() {
     }
 }
 
-document.getElementById('btnToggleChart').addEventListener('click', (e) => {
-    currentType = currentType === 'bar' ? 'pie' : 'bar';
-    e.target.innerText = currentType === 'bar' ? 'สลับเป็นกราฟวงกลม' : 'สลับเป็นกราฟแท่ง';
-    renderChart(currentType);
-});
-
 document.addEventListener("DOMContentLoaded", () => {
     const now = new Date();
     monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
     autoRefreshAnalysis();
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const now = new Date();
+    
+    if (monthInput) {
+        monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    const btnToggle = document.getElementById('btnToggleChart');
+    if (btnToggle) {
+        btnToggle.addEventListener('click', (e) => {
+            currentType = currentType === 'bar' ? 'pie' : 'bar';
+            e.target.innerText = currentType === 'bar' ? 'สลับเป็นกราฟวงกลม' : 'สลับเป็นกราฟแท่ง';
+            renderChart(currentType);
+        });
+    }
+
+    autoRefreshAnalysis();
+});
+
+if (monthInput) monthInput.onchange = autoRefreshAnalysis;
+if (btnAnalyze) btnAnalyze.onclick = autoRefreshAnalysis;
 
 monthInput.onchange = autoRefreshAnalysis;
 btnAnalyze.onclick = autoRefreshAnalysis;
